@@ -103,7 +103,7 @@ export default function MobileMenu() {
               <Image
                 className="logo-dark"
                 alt="Corporate Logo"
-                src="/assets/images/logo/logo-dark.png"
+                src="/assets/images/logo/taxlight-dark.png"
                 width={288}
                 height={100}
               />
