@@ -1,0 +1,85 @@
+.logo img {
+  width: auto;
+  max-width: 100%;
+}
+
+a {
+  cursor: pointer;
+}
+.typeanimation {
+  transition: width 0.58s ease-out !important;
+  height: 100% !important;
+  margin-top: -10px;
+  padding-right: 10px;
+  b.is-visible {
+    padding-right: 10px !important;
+  }
+}
+.popup-mobile-menu {
+  .rainbow-megamenu,
+  .submenu {
+    display: block !important;
+    overflow: hidden;
+    transition: 0.5s;
+    height: 0px;
+  }
+}
+.mainmenu-nav .mainmenu > li > a.current {
+  color: var(--color-primary) !important;
+}
+.mainmenu-nav.onepagenav .mainmenu > li > a.current::after {
+  width: 100%;
+  opacity: 1;
+}
+.activeParent {
+  color: var(--color-primary) !important;
+}
+.cd-headline.clip .cd-words-wrapper::after {
+  margin-left: 10px !important;
+}
+.nextjs-svg {
+  fill: #fff;
+}
+.active-light-mode .nextjs-svg,
+.active-light-mode .invert-on-light {
+  filter: invert(1) brightness(2);
+}
+.rainbow-themes-link {
+  transition: 0.3s;
+  &:hover {
+    color: var(--color-primary) !important;
+  }
+}
+.modal-video-body {
+  max-width: 1300px !important;
+}
+.modal-video-movie-wrap {
+  border-radius: 9px;
+  // overflow: hidden;
+}
+.modal-video-close-btn {
+  top: -40px !important;
+  transform: scale(0.8);
+}
+.modal-video-close-btn:before,
+.modal-video-close-btn:after {
+  height: 3px !important;
+}
+.radial-progress .circle-text span.count::after {
+  content: "";
+}
+.pswp__bg {
+  opacity: 1 !important;
+  background: #000 !important;
+}
+.modal-video {
+  background: rgba(11, 11, 11, 0.8) !important;
+}
+@media (max-width: 991px) {
+  .advance-pricing-left {
+    border-radius: 10px 10px 0px 0px !important;
+  }
+}
+.success-message {
+  color: green;
+}
