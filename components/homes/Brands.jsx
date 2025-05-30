@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { brandImages } from "@/data/brands";
+import { brandImages } from "../../data/brands";
 export default function Brands() {
   return (
     <div className="rainbow-brand-area pt--80 pb--80">
