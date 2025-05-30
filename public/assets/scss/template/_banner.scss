@@ -212,7 +212,11 @@
         &.btn-border {
           border-color: var(--color-border);
           color: var(--color-white);
+          &:hover {
+                        color: #000; /* Negro en hover */
+                    }
         }
+        
       }
     }
   }
