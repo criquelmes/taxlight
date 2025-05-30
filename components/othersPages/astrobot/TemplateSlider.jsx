@@ -2,8 +2,8 @@
 import React from "react";
 import Slider from "react-slick";
 import Image from "next/image";
-import { NextArrow, PrevArrow } from "@/components/common/SliderArrows";
-import { services4 } from "@/data/service";
+import { NextArrow, PrevArrow } from "../../common/SliderArrows";
+import { services4 } from "../../../data/service";
 
 export default function TemplateSlider() {
   const options = {
