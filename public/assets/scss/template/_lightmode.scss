@@ -56,7 +56,7 @@ body {
 
         .slider-style-8 .inner a.btn-default.btn-border, 
         .slider-style-8 .inner button.btn-default.btn-border {
-            border-color: #d8d8d8;
+            border-color: #000;
             color: #65676b;
         }
 
@@ -233,7 +233,7 @@ body {
 
         a.btn-default.text-underline,
         button.btn-default.text-underline {
-            border-color: #181818;
+            border-color: #000;
             color: #181818;
         }
 
@@ -439,14 +439,14 @@ body.active-light-mode .advance-tab-button-1 .tab-button-list .tab-button::after
 
 body.active-light-mode a.btn-default.btn-border,
 body.active-light-mode button.btn-default.btn-border {
-    border-color: #00000024;
-    color: #181818;
+    border-color: #000;
+    color: #000;
 }
 
 body.active-light-mode a.btn-default.btn-border:hover,
 body.active-light-mode button.btn-default.btn-border:hover {
-    border-color: var(--color-secondary);
-    color: #fff;
+    border-color: #000;
+    color: #000;
 }
 
 body.active-light-mode .rainbow-box-card .inner .thumbnail,
@@ -550,6 +550,13 @@ body.active-light-mode .logo-active-light-mode {
 
 body.active-light-mode .logo-dark {
     display: block;
+}
+
+body.active-light-mode .image-light-hero {
+    display: none;
+}
+body.active-dark-mode .image-dark-hero {
+    display: none;
 }
 
 body.active-light-mode .slider-area.bg-transparent .inner a.btn-default.btn-border, 
