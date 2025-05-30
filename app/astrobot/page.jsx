@@ -1,11 +1,10 @@
-import Footer3 from "@/components/footers/Footer3";
-import Header2 from "@/components/headers/Header2";
+import Footer3 from "../../components/footers/Footer3";
+import Header2 from "../../components/headers/Header2";
 
-import Hero from "@/components/othersPages/about/Hero";
-import HowWorks from "@/components/othersPages/about/HowWorks";
-import Service from "@/components/othersPages/astrobot/Service";
-import ServiceAstrobot from "@/components/othersPages/astrobot/Service";
-import TemplateSlider from "@/components/othersPages/astrobot/TemplateSlider";
+import Hero from "../../components/othersPages/about/Hero";
+import HowWorks from "../../components/othersPages/about/HowWorks";
+import Service from "../../components/othersPages/astrobot/Service";
+import TemplateSlider from "../../components/othersPages/astrobot/TemplateSlider";
 import React from "react";
 
 export const metadata = {
