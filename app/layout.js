@@ -5,9 +5,10 @@ import "react-modal-video/scss/modal-video.scss";
 import "photoswipe/dist/photoswipe.css";
 import { usePathname } from "next/navigation";
 import sal from "sal.js";
-import BackToTop from "@/components/common/BackToTop";
-import MobileMenu from "@/components/headers/MobileMenu";
-import { closeMenu } from "@/utlis/toggleMenu";
+
+import BackToTop from "../components/common/BackToTop";
+import MobileMenu from "../components/headers/MobileMenu";
+import { closeMenu } from "../utlis/toggleMenu";
 
 export default function RootLayout({ children }) {
   useEffect(() => {

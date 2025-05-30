@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import TyperComponent from "@/components/common/TyperComponent";
+import TyperComponent from "../common/TyperComponent";
 export default function Faq() {
   return (
     <div className="rainbow-company-mission-are rainbow-section-gap">

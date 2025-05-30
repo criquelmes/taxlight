@@ -4,7 +4,7 @@ import Nav from "./Nav";
 import Image from "next/image";
 import Link from "next/link";
 import ModeSwitcher from "../common/ModeSwitcher";
-import { openMenu } from "@/utlis/toggleMenu";
+import { openMenu } from "../../utlis/toggleMenu";
 export default function Header2({
   parentClass = "rainbow-header header-default header-left-align header-not-transparent header-sticky",
   btnClass = "btn-default btn-small round",
