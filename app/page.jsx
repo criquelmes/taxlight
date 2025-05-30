@@ -1,13 +1,13 @@
-import Header2 from "@/components/headers/Header2";
-import Hero from "@/components/homes/Hero";
-import About from "@/components/homes/About";
-import Service from "@/components/homes/Service";
-import Faq from "@/components/homes/Faq";
-import Cta from "@/components/preview/Cta";
-import Footer3 from "@/components/footers/Footer3";
-import Pricing from "@/components/elements/Pricing";
-import Brands from "@/components/homes/Brands";
-import Testimonials from "@/components/common/Testimonials";
+import Header2 from "../components/headers/Header2";
+import Hero from "../components/homes/Hero";
+import About from "../components/homes/About";
+import Service from "../components/homes/Service";
+import Faq from "../components/homes/Faq";
+import Cta from "../components/preview/Cta";
+import Footer3 from "../components/footers/Footer3";
+import Pricing from "../components/elements/Pricing";
+import Brands from "../components/homes/Brands";
+import Testimonials from "../components/common/Testimonials";
 
 export const metadata = {
   title: "Taxlight | Soluciones tributarias",

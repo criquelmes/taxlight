@@ -1,5 +1,5 @@
 "use client";
-import { menuItems } from "@/data/menu";
+import { menuItems } from "../../data/menu";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";

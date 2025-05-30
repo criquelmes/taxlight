@@ -1,4 +1,4 @@
-import { pricingPlans } from "@/data/pricing";
+import { pricingPlans } from "../../data/pricing";
 import React from "react";
 
 export default function Pricing() {

@@ -1,5 +1,6 @@
 import Footer3 from "@/components/footers/Footer3";
 import Header2 from "@/components/headers/Header2";
+
 import Hero from "@/components/othersPages/about/Hero";
 import HowWorks from "@/components/othersPages/about/HowWorks";
 import Service from "@/components/othersPages/astrobot/Service";
