@@ -1,7 +1,7 @@
-import Footer3 from "@/components/footers/Footer3";
-import Header2 from "@/components/headers/Header2";
+import Footer3 from "../../components/footers/Footer3";
+import Header2 from "../../components/headers/Header2";
 
-import Contact from "@/components/othersPages/Contact";
+import Contact from "../../components/othersPages/Contact";
 
 export const metadata = {
   title: "Contacto || Tax Light | soluciones tributarias",
