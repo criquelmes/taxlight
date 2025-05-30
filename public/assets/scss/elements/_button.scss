@@ -46,7 +46,7 @@ div {
         }
 
         &:hover {
-            box-shadow: var(--shadow-primary);
+            box-shadow: white;
             -webkit-filter: brightness(125%);
             filter: brightness(125%);
             color: var(--color-white);
@@ -89,13 +89,15 @@ div {
 
         &.btn-border {
             background-image: inherit;
-            border-color: var(--color-border);
+            border-color: #000;
             border-width: 2px;
             border-style: solid;
+            color: #000;
 
             &:hover {
-                background-color: #53278c;
-                border-color: var(--color-secondary);
+                background-color: white;
+                border-color: white;
+                color: #000;
             }
         }
 
@@ -109,8 +111,8 @@ div {
             }
             &:hover {
                 box-shadow: none;
-                background-color: var(--color-secondary);
-                border-color: var(--color-secondary);
+                background-color: white;
+                border-color: white;
             }
         }
         &.round {
