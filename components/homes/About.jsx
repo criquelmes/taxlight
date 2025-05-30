@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import TyperComponent from "@/components/common/TyperComponent";
+import TyperComponent from "../common/TyperComponent";
 import Link from "next/link";
 export default function About() {
   return (
