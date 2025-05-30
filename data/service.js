@@ -93,23 +93,23 @@ export const services3 = [
 
 export const services4 = [
   {
-    title: "Security Command",
+    title: "Disponibilidad Inmediata",
     description:
-      "From its medieval origins to the digital era, learn everything there is to know about the ubiquitous lorem ipsum passage.",
+      "No importa la hora o el día, el Chatbot Legal está siempre disponible para responder tus preguntas.",
     delay: 0,
     href: "#",
   },
   {
-    title: "Policy Intelligence",
+    title: "Información Precisa",
     description:
-      "The passage experienced a surge in popularity during the 1960s when Letraset used it on their dry-transfer sheets.",
+      "Alimentado con una base de datos actualizada y revisada por nuestros expertos, te brinda respuestas concretas.",
     delay: 100,
     href: "#",
   },
   {
-    title: "Risk Protection",
+    title: "Aprendizaje Constante",
     description:
-      "Until recently, the prevailing view assumed lorem ipsum was born as a nonsense text. “It's not Latin, though it looks like it.",
+      "Tu consulta es anónima y no almacenamos datos personales a menos que optes por una consulta más personalizada con nuestro equipo.",
     delay: 200,
     href: "#",
   },

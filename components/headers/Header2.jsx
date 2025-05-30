@@ -44,7 +44,7 @@ export default function Header2({
               </nav>
               <div className="header-btn">
                 <a className={btnClass} target="_blank" href="/purshase">
-                  Contratar
+                  Acceder
                 </a>
               </div>
               {/* Start Mobile-Menu-Bar */}
