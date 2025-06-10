@@ -4,9 +4,9 @@ export const menuItems = [
     hasDropdown: true,
     submenu: [
       { href: "/astrobot", label: "Astrobot" },
-      { href: "/diagnostico-tributario", label: "Diagnóstico Tributario" },
+      { href: "/diagnostico", label: "Diagnóstico Tributario" },
       {
-        href: "/estructuracion-tributaria",
+        href: "/estructuracion",
         label: "Estructuración Tributaria",
       },
     ],
