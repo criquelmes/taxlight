@@ -252,9 +252,9 @@ export const serviceData = [
 export const serviceData2 = [
   {
     id: 1,
-    title: "Awarded Design",
+    title: "Revisión de Antecedentes",
     description:
-      "There are many variations variats of passages of Lorem Ipsum available, but the majority.",
+      "Descubriremos cualquier contingencia fiscal que puedas tener y evaluaremos el nivel de riesgo de fiscalización. Nuestra meta es brindarte soluciones prácticas y estratégicas para mitigar estas contingencias y optimizar tu enfoque tributario.",
     imageSrc: "/assets/images/services/icon-01.png",
     width: 500,
     height: 536,
@@ -262,9 +262,9 @@ export const serviceData2 = [
   },
   {
     id: 2,
-    title: "Travel Agency",
+    title: "Identificación de Contingencias",
     description:
-      "Passages there are many variatin Lorem Ipsum available, but the majority have suffered.",
+      "Nuestro equipo de expertos se sumergirá en los detalles para determinar si has tenido ganancias tributables o pérdidas en años anteriores.Además, evaluaremos tu historial con el Servicio de Impuestos Internos (SII) y cualquier proceso de fiscalización en curso.",
     imageSrc: "/assets/images/services/icon-02.png",
     width: 500,
     height: 553,
@@ -273,9 +273,9 @@ export const serviceData2 = [
   },
   {
     id: 3,
-    title: "Creative Agency",
+    title: "Planificación para el Futuro",
     description:
-      "Variations There are many of pass ages of Lorem Ipsum available, but the majority but the majority.",
+      "No solo nos enfocamos en el pasado, sino también en el futuro. Discutiremos tus objetivos a largo plazo en el mundo de los criptoactivos y te proporcionaremos recomendaciones específicas para mejorar tu eficiencia tributaria.",
     imageSrc: "/assets/images/services/icon-03.png",
     width: 500,
     height: 566,
