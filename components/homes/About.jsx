@@ -16,7 +16,7 @@ export default function About() {
               <Image
                 className="w-100"
                 alt="About Images"
-                src="/assets/images/about/about-1.png"
+                src="/assets/images/IMG_9874.jpg"
                 width={543}
                 height={642}
               />

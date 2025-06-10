@@ -1,20 +1,20 @@
 export const testimonials = [
   {
-    imgSrc: "/assets/images/testimonial/testimonial-01.jpg",
+    imgSrc: "/assets/images/IMG_9865.jpg",
     alt: "Corporate Template",
     description:
       "“ Excepteur sint occaecat cupidatat non proident mollit anim..„",
-    title: "Felipe Godoy",
-    subtitle: "descripcion",
+    title: "Germán Vargas",
+    subtitle: "Abogado",
     salDelay: 0,
   },
   {
-    imgSrc: "/assets/images/testimonial/testimonial-02.jpg",
+    imgSrc: "/assets/images/IMG_9872.jpg",
     alt: "Corporate React Template",
     description:
       "“Duis aute irure dolor in reprehenderit cillum dolore eu fugiat nulla pariatur.„",
-    title: "Germán Vargas",
-    subtitle: "descripcion",
+    title: "Felipe Godoy",
+    subtitle: "Abogado",
     salDelay: 100,
   },
 ];
