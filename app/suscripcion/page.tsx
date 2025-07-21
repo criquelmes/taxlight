@@ -1,10 +1,7 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { add, suscribe } from "../../actions";
+// app/suscripcion/page.tsx
+import { Suspense } from "react";
 import Header2 from "../../components/headers/Header2";
-import OrderSummary from "../../components/order/OrderSummary";
+import SuscripcionContent from "./SuscripcionContent";
 
 interface SuscripcionPageProps {
   searchParams: {
@@ -15,28 +12,26 @@ interface SuscripcionPageProps {
   };
 }
 
+// Componente de loading
+function SuscripcionLoading() {
+  return (
+    <div className="rainbow-prfile-area rainbow-section-gap">
+      <div className="container">
+        <div className="text-center">
+          <div className="spinner-border" role="status">
+            <span className="sr-only">Cargando...</span>
+          </div>
+          <p>Procesando información de suscripción...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SuscripcionPage({
   searchParams,
 }: SuscripcionPageProps) {
-  const router = useRouter();
-  const searchParamsHook = useSearchParams();
-
   const { plan, title, type, preapproval_id } = searchParams;
-
-  useEffect(() => {
-    const preapprovalId = searchParamsHook.get("preapproval_id");
-
-    if (preapprovalId) {
-      console.log(`✅ Pago exitoso! Suscripción ID: ${preapprovalId}`);
-
-      const params = new URLSearchParams(searchParamsHook.toString());
-      params.delete("preapproval_id");
-
-      const newUrl = params.toString() ? `?${params.toString()}` : "";
-
-      router.replace(`/suscripcion${newUrl}`, { scroll: false });
-    }
-  }, [searchParamsHook, router]);
 
   return (
     <>
@@ -71,18 +66,15 @@ export default function SuscripcionPage({
         </div>
       </div>
 
-      {/* Main Checkout Area */}
-      <div className="rainbow-prfile-area rainbow-section-gap">
-        <div className="container">
-          <OrderSummary
-            onSubscribe={suscribe}
-            onAdd={add}
-            selectedPlan={plan}
-            selectedTitle={title}
-            selectedType={type}
-          />
-        </div>
-      </div>
+      {/* Main Checkout Area con Suspense */}
+      <Suspense fallback={<SuscripcionLoading />}>
+        <SuscripcionContent
+          initialPlan={plan}
+          initialTitle={title}
+          initialType={type}
+          hasPreapprovalId={!!preapproval_id}
+        />
+      </Suspense>
     </>
   );
 }
