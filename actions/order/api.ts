@@ -927,7 +927,7 @@ export async function initializeSubscriptionsAndProducts() {
       createdSubscriptions.push(subscription);
     }
 
-    const productTypes: ("ASTROBOT" | "BITE")[] = ["ASTROBOT", "BITE"];
+    const productTypes = ["ASTROBOT", "BITE"] as const;
 
     for (const subscription of createdSubscriptions) {
       for (const productType of productTypes) {
