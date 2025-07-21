@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import api from "../order/api";
 
 export async function suscribe(formData: FormData) {
