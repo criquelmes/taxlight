@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "postinstall": "prisma generate",
     "lint": "next lint",
     "seed": "ts-node seed/seed-subscriptions.ts"
   },
@@ -21,6 +22,7 @@
     "next": "14.2.15",
     "node-cron": "^4.2.1",
     "photoswipe": "^5.4.4",
+    "prisma": "^6.10.1",
     "prop-types": "^15.8.1",
     "react": "^18",
     "react-dom": "^18",
@@ -38,7 +40,6 @@
     "@types/node": "22.15.28",
     "@types/node-cron": "^3.0.11",
     "@types/react": "19.1.6",
-    "prisma": "^6.10.1",
     "typescript": "5.8.3"
   }
 }
