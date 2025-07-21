@@ -28,7 +28,7 @@ function formatSubscriptionWithProducts(subscription: any) {
   };
 }
 
-// Función para alcular fecha de vencimiento
+// Función para calcular fecha de vencimiento
 function calculateExpirationDate(paidAt: Date, subscriptionName: string): Date {
   const date = new Date(paidAt);
 
@@ -72,12 +72,104 @@ async function createSubscriptionLog(
     });
     console.log(`📝 Log creado: ${action} para order ${orderId}`);
   } catch (error) {
-    console.error("Error creando log:", error);
+    console.error("❌ Error creando log:", error);
+  }
+}
+
+// FUNCIÓN PARA VALIDAR CUENTA EXTERNA ANTES DEL PAGO
+async function validateExternalAccount(userData: {
+  email: string;
+  name: string;
+  products: string[];
+}) {
+  try {
+    console.log(`🔍 Validando cuenta externa para: ${userData.email}`);
+    console.log(`🎯 Productos: ${userData.products.join(", ")}`);
+
+    const accountData = {
+      email: userData.email,
+      name: userData.name,
+      product: userData.products.map((product) => product.toLowerCase()),
+    };
+
+    console.log(
+      `📦 Validando con datos:`,
+      JSON.stringify(accountData, null, 2)
+    );
+
+    // Intentar crear la cuenta para verificar si ya existe
+    const response = await fetch("https://owuii.enkoding.io/accounts", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "X-API-Key": process.env.EXTERNAL_API_TOKEN!,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(accountData),
+    });
+
+    // MEJORA: Manejar respuestas no-JSON
+    let result;
+    try {
+      result = await response.json();
+    } catch (jsonError) {
+      const textResponse = await response.text();
+      console.error(`❌ Respuesta de validación no es JSON:`, textResponse);
+      return {
+        valid: false,
+        error: "INVALID_RESPONSE",
+        message: "Respuesta inválida del servicio externo",
+        details: textResponse,
+      };
+    }
+
+    if (response.status === 409) {
+      // Cuenta ya existe
+      console.warn(`⚠️ Cuenta ya existe para ${userData.email}:`, result);
+      return {
+        valid: false,
+        error: "ACCOUNT_EXISTS",
+        message:
+          "Ya tienes una cuenta activa. No puedes crear una nueva suscripción.",
+        details: result,
+      };
+    }
+
+    if (!response.ok) {
+      // Otro tipo de error
+      console.error(`❌ Error validando cuenta (${response.status}):`, result);
+      return {
+        valid: false,
+        error: "VALIDATION_ERROR",
+        message: `Error al validar la cuenta: ${response.status}`,
+        details: result,
+      };
+    }
+
+    // La cuenta se pudo crear exitosamente
+    console.log(
+      `✅ Validación exitosa para ${userData.email} - cuenta creada en validación`
+    );
+    return {
+      valid: true,
+      message: "Cuenta válida para crear suscripción",
+      accountAlreadyCreated: true, // Flag importante
+      details: result,
+    };
+  } catch (error) {
+    console.error(`❌ Error durante validación:`, error);
+    return {
+      valid: false,
+      error: "NETWORK_ERROR",
+      message: "Error de conexión al validar la cuenta",
+      details: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
 const api = {
   user: {
+    // FUNCIÓN PRINCIPAL DE SUSCRIPCIÓN CON VALIDACIÓN PREVIA
     async suscribe(
       email: string,
       name: string,
@@ -85,6 +177,7 @@ const api = {
       includeBite: boolean = false
     ) {
       try {
+        // PASO 1: Validaciones básicas
         if (!isValidEmail(email)) {
           throw new Error("Email inválido");
         }
@@ -93,6 +186,61 @@ const api = {
           throw new Error("Nombre es requerido");
         }
 
+        console.log(
+          `🚀 Iniciando suscripción para ${email}: ${subscriptionType} ${
+            includeBite ? "con Bite" : "solo Astrobot"
+          }`
+        );
+
+        // PASO 2: Buscar suscripción correspondiente
+        const subscription = await api.subscription.createCustomSubscription(
+          subscriptionType,
+          includeBite
+        );
+
+        if (!subscription) {
+          throw new Error("No se pudo encontrar la suscripción");
+        }
+
+        console.log(`✅ Suscripción encontrada:`, {
+          name: subscription.name,
+          price: subscription.price,
+          products: subscription.products.map((p) => p.name),
+        });
+
+        // PASO 3: VALIDACIÓN PREVIA - Verificar cuenta externa ANTES del pago
+        const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
+
+        console.log(`🔍 Validando cuenta externa antes del pago...`);
+        const validation = await validateExternalAccount({
+          email: email,
+          name: name.trim(),
+          products: products,
+        });
+
+        if (!validation.valid) {
+          // La validación falló - no crear suscripción en MercadoPago
+          console.error(`❌ Validación falló: ${validation.error}`);
+
+          // Lanzar error específico según el tipo
+          if (validation.error === "ACCOUNT_EXISTS") {
+            throw new Error(
+              "Ya tienes una cuenta activa. No puedes crear una nueva suscripción."
+            );
+          } else if (validation.error === "NETWORK_ERROR") {
+            throw new Error(
+              "Error de conexión. Por favor, inténtalo de nuevo."
+            );
+          } else {
+            throw new Error(
+              `Error al validar la cuenta: ${validation.message}`
+            );
+          }
+        }
+
+        console.log(`✅ Validación exitosa - procediendo con MercadoPago`);
+
+        // PASO 4: Buscar o crear el usuario en nuestra BD
         let user = await prisma.user.findUnique({
           where: { email },
         });
@@ -104,25 +252,18 @@ const api = {
               name: name.trim(),
             },
           });
+          console.log(`👤 Usuario creado: ${user.email}`);
+        } else {
+          console.log(`👤 Usuario existente: ${user.email}`);
         }
 
-        const subscription = await api.subscription.createCustomSubscription(
-          subscriptionType,
-          includeBite
-        );
-
-        console.log({ subscription });
-
-        if (!subscription) {
-          throw new Error("No se pudo encontrar la suscripción");
-        }
-
-        const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
+        // PASO 5: Crear la suscripción en MercadoPago (solo si validación pasó)
         const productNames = products
           .map((p) => p.charAt(0) + p.slice(1).toLowerCase())
           .join(" + ");
 
-        // Crear la suscripción en MercadoPago
+        console.log(`💳 Creando suscripción en MercadoPago...`);
+
         const mpSubscription = await new PreApproval(mercadopago).create({
           body: {
             back_url: process.env.APP_URL!,
@@ -140,7 +281,9 @@ const api = {
           },
         });
 
-        // Crear la orden pendiente
+        console.log(`✅ Suscripción MercadoPago creada: ${mpSubscription.id}`);
+
+        // PASO 6: Crear la orden pendiente con flag de validación
         const order = await prisma.order.create({
           data: {
             userId: user.id,
@@ -168,13 +311,15 @@ const api = {
           },
         });
 
-        // Crear log de auditoría
+        // PASO 7: Log con nota de validación previa
         await createSubscriptionLog(
           "CREATED",
           order.id,
           user.id,
-          `Suscripción ${subscriptionType} creada con productos: ${productNames}`
+          `Suscripción ${subscriptionType} creada con productos: ${productNames} (cuenta externa pre-validada y creada)`
         );
+
+        console.log(`✅ Proceso completo - Orden creada: ${order.id}`);
 
         return {
           initPoint: mpSubscription.init_point!,
@@ -182,9 +327,10 @@ const api = {
           mpSubscriptionId: mpSubscription.id,
           dbSubscriptionId: subscription.id,
           products: products.map((p) => p.toLowerCase()),
+          preValidated: true, // Flag para indicar que ya se validó y creó la cuenta
         };
       } catch (error) {
-        console.error("Error en suscribe:", error);
+        console.error("❌ Error en suscribe:", error);
         throw error;
       }
     },
@@ -234,7 +380,7 @@ const api = {
 
         return user;
       } catch (error) {
-        console.error("Error en findOrCreate:", error);
+        console.error("❌ Error en findOrCreate:", error);
         throw error;
       }
     },
@@ -259,7 +405,7 @@ const api = {
           data: updateData,
         });
       } catch (error) {
-        console.error("Error en update:", error);
+        console.error("❌ Error en update:", error);
         throw error;
       }
     },
@@ -299,7 +445,7 @@ const api = {
         console.log(`👤 Usuario ${userId} desactivado: ${reason}`);
         return user;
       } catch (error) {
-        console.error("Error al desactivar usuario:", error);
+        console.error("❌ Error al desactivar usuario:", error);
         throw error;
       }
     },
@@ -792,6 +938,7 @@ const api = {
       return subscription ? formatSubscriptionWithProducts(subscription) : null;
     },
 
+    // FUNCIÓN SIMPLIFICADA - SOLO BUSCA LA SUSCRIPCIÓN EXISTENTE
     async createCustomSubscription(
       subscriptionType: "monthly" | "annual",
       includeBite: boolean
@@ -826,6 +973,7 @@ const api = {
           `💰 Precio: $${subscription.price.toLocaleString("es-CL")} CLP`
         );
 
+        // MEJORA: Verificación más robusta de productos
         const hasCorrectProducts = expectedProducts.every((product) =>
           productNames.includes(product as $Enums.ProductType)
         );
@@ -895,7 +1043,7 @@ const api = {
   },
 };
 
-// Función para inicializar suscripciones y productos
+// Función para inicializar suscripciones y productos (mantener para retrocompatibilidad)
 export async function initializeSubscriptionsAndProducts() {
   try {
     const subscriptions = [

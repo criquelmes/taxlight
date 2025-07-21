@@ -36,8 +36,6 @@ export default function SuscripcionContent({
     }
   }, [searchParams, router]);
 
-  // Usar los parámetros desde searchParams si están disponibles,
-  // sino usar los valores iniciales del server component
   const plan = searchParams.get("plan") || initialPlan;
   const title = searchParams.get("title") || initialTitle;
   const type = searchParams.get("type") || initialType;

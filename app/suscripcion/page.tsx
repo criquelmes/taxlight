@@ -1,4 +1,3 @@
-// app/suscripcion/page.tsx
 import { Suspense } from "react";
 import Header2 from "../../components/headers/Header2";
 import SuscripcionContent from "./SuscripcionContent";
