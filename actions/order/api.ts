@@ -827,7 +827,7 @@ const api = {
         );
 
         const hasCorrectProducts = expectedProducts.every((product) =>
-          productNames.includes(product)
+          productNames.includes(product as $Enums.ProductType)
         );
 
         if (!hasCorrectProducts) {
