@@ -29,7 +29,7 @@
                 font-size: 16px;
                 margin: 0;
 
-                &::after {
+                &:not(:last-child)::after {
                     position: absolute;
                     content: "";
                     top: 50%;

@@ -3,6 +3,7 @@ import { useState } from "react";
 import ModalVideo from "react-modal-video";
 import Image from "next/image";
 import Link from "next/link";
+
 export default function HowWorks() {
   const [isOpen, setOpen] = useState(false);
   return (

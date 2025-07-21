@@ -8,6 +8,7 @@ export const metadata = {
   description:
     "Soluciones tributarias adaptadas a la era digital. Hemos desarrollado una plataforma especializada que combina la experiencia tributaria con el conocimiento de criptoactivos. Bienvenidos a Taxlight",
 };
+
 export default function page() {
   return (
     <>

@@ -8,12 +8,6 @@ export default function Cta() {
           <div className="col-lg-12">
             <div className="inner">
               <div className="content text-center">
-                {/* <div className="react-image relative">
-                  <img
-                    className="nextjs-svg"
-                    src="\assets\images\logo\taxlight-light.png"
-                  />
-                </div> */}
                 <h2 className="title display-two">
                   ¡Contrata a nuestro{" "}
                   <span className="theme-gradient">
@@ -28,7 +22,7 @@ export default function Cta() {
                   inmediatas y precisas.
                 </h6>
                 <div className="call-to-btn text-center mt--30">
-                  <a className="btn-default btn-icon" target="_blank" href="#">
+                  <a className="btn-default btn-icon" href="/suscripcion">
                     Contratar <i className="icon feather-arrow-right"> </i>
                   </a>
                 </div>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ModeSwitcher from "../common/ModeSwitcher";
 import { openMenu } from "../../utlis/toggleMenu";
+
 export default function Header2({
   parentClass = "rainbow-header header-default header-left-align header-not-transparent header-sticky",
   btnClass = "btn-default btn-small round",
@@ -43,8 +44,8 @@ export default function Header2({
                 </ul>
               </nav>
               <div className="header-btn">
-                <a className={btnClass} target="_blank" href="/purshase">
-                  Acceder
+                <a className={btnClass} href="/suscripcion">
+                  Suscribirme
                 </a>
               </div>
               {/* Start Mobile-Menu-Bar */}
@@ -55,10 +56,8 @@ export default function Header2({
                   </button>
                 </div>
               </div>
-              {/* Start Mobile-Menu-Bar */}
               {/* Start Switcher Area  */}
               <ModeSwitcher />
-              {/* Start Switcher Area  */}
             </div>
           </div>
         </div>

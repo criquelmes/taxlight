@@ -101,6 +101,20 @@ div {
             }
         }
 
+        &.btn-border-white {
+            background-image: inherit;
+            border-color: var(--color-border);
+            border-width: 1px;
+            border-style: solid;
+            color: var(--color-white);
+
+            &:hover {
+                background-color: white;
+                border-color: white;
+                color: #000;
+            }
+        }
+
         &.text-underline {
             background-image: inherit;
             border-color: var(--color-white);

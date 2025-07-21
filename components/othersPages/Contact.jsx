@@ -45,7 +45,6 @@ export default function Contact() {
       });
   };
 
-  // Usar useEffect para el timer
   React.useEffect(() => {
     let timer;
     if (result.show) {

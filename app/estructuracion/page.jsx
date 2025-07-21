@@ -12,7 +12,7 @@ export const metadata = {
 export default function EstructuracionTributariaPage() {
   return (
     <>
-      <Header2 />
+      <Header2 parentClass="rainbow-header header-default header-sticky" />
       <div>
         <div className="rainbow-gradient-circle" />
         <div className="rainbow-gradient-circle theme-pink" />

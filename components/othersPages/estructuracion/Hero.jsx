@@ -5,6 +5,12 @@ export default function Hero() {
     <div
       className="slider-area slider-style-1 variation-default height-850 bg_image bg_image--12"
       data-black-overlay={7}
+      style={{
+        backgroundImage: "url('/assets/images/bg/hero-estructuracion.jpg')",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+      }}
     >
       <div className="container">
         <div className="row">

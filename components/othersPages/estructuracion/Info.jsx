@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 const items = [
@@ -8,6 +10,7 @@ const items = [
   "Maximiza tus beneficios en el mundo de los criptoactivos de manera responsable y ética.",
 ];
 export default function Info() {
+  const [isHovered, setIsHovered] = useState(false);
   return (
     <div className="rainbow-about-area rainbow-section-gap">
       <div className="container">
@@ -57,19 +60,24 @@ export default function Info() {
                   ))}
                 </ul>
                 <div className="button-group mt--40">
-                  <a
-                    className="btn-default btn-medium round btn-icon"
-                    target="_blank"
-                    href="#"
-                  >
-                    Contratar <i className="icon feather-arrow-right" />
-                  </a>
+                  <Link className="btn-default" target="_blank" href="#">
+                    Contratar
+                  </Link>
                   <Link
-                    className="btn-default btn-medium btn-border round btn-icon text-white border border-white "
+                    className="btn-default btn-border"
+                    style={{
+                      border: isHovered
+                        ? "1px solid white"
+                        : "1px solid rgba(255, 255, 255, 0.2)",
+                      backgroundColor: isHovered ? "white" : "transparent",
+                      color: isHovered ? "black" : "white",
+                      transition: "all 0.3s ease",
+                    }}
                     href="#"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
                   >
                     Más información
-                    <i className="icon feather-arrow-right" />
                   </Link>
                 </div>
               </div>

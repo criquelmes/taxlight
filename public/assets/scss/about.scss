@@ -1,0 +1,297 @@
+.hero-background {
+  background-image: url("/assets/images/bg/astrobot-left.png");
+  background-repeat: no-repeat;
+  min-height: 850px;
+  background-size: 45%;
+  background-position: right center;
+  position: relative;
+  
+  // Overlay oscuro usando variables del sistema
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+  }
+  
+  // Asegurar que el contenido esté por encima del overlay
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+  
+  // Contenido del hero
+  .hero-content {
+    display: flex;
+    align-items: center;
+    min-height: 850px;
+    
+    .inner {
+      width: 100%;
+      text-align: center;
+      padding-top: 80px;
+      
+      .rainbow-sub-badge {
+        margin-bottom: 20px;
+        
+        .theme-gradient {
+          background: linear-gradient(
+            95deg,
+            var(--color-primary) 15%,
+            var(--color-tertiary) 45%,
+            var(--color-pink) 75%,
+            var(--color-secondary) 100%
+          ) 98%/200% 100%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+      }
+      
+      .title {
+        font-size: var(--h1);
+        color: var(--color-heading);
+        font-weight: var(--p-bold);
+        margin-bottom: 30px;
+        
+        &.display-one {
+          font-size: 75px;
+          line-height: 1.19;
+        }
+      }
+      
+      .description {
+        font-size: var(--font-size-b1);
+        color: var(--color-body);
+        line-height: var(--line-height-b1);
+        margin-bottom: 40px;
+        padding: 0 10%;
+      }
+      
+      .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        
+        .btn-default {
+          min-width: 200px;
+          height: 60px;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Tablet
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  .hero-background {
+    background-size: 55%;
+    background-position: right center;
+    min-height: 750px;
+    
+    .hero-content {
+      min-height: 750px;
+      
+      .inner {
+        padding-top: 60px;
+        
+        .title.display-one {
+          font-size: 60px;
+        }
+        
+        .description {
+          padding: 0 5%;
+          font-size: var(--font-size-b2);
+        }
+        
+        .button-group {
+          gap: 15px;
+          
+          .btn-default {
+            min-width: 180px;
+            height: 55px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile landscape
+@media only screen and (max-width: 768px) {
+  .hero-background {
+    background-size: 70%;
+    background-position: center bottom;
+    min-height: 600px;
+    
+    .hero-content {
+      min-height: 600px;
+      
+      .inner {
+        padding-top: 40px;
+        
+        .title.display-one {
+          font-size: 50px;
+        }
+        
+        .description {
+          padding: 0;
+          font-size: var(--font-size-b2);
+          margin-bottom: 30px;
+        }
+        
+        .button-group {
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+          
+          .btn-default {
+            width: 100%;
+            max-width: 300px;
+            height: 50px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile portrait
+@media only screen and (max-width: 480px) {
+  .hero-background {
+    background-size: 80%;
+    background-position: center bottom;
+    min-height: 500px;
+    
+    .hero-content {
+      min-height: 500px;
+      
+      .inner {
+        padding-top: 30px;
+        
+        .rainbow-sub-badge {
+          margin-bottom: 15px;
+        }
+        
+        .title.display-one {
+          font-size: 40px;
+          margin-bottom: 20px;
+        }
+        
+        .description {
+          font-size: 14px;
+          line-height: 1.6;
+          margin-bottom: 25px;
+        }
+        
+        .button-group {
+          .btn-default {
+            height: 45px;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animaciones usando el sistema existente
+.hero-animation {
+  &.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+  }
+  
+  &.slide-in-left {
+    animation: slideInLeft 1s ease-out;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Variaciones del hero
+.hero-background {
+  &.hero-variant-center {
+    background-position: center center;
+    
+    .inner {
+      text-align: center;
+    }
+  }
+  
+  &.hero-variant-left {
+    background-position: left center;
+    
+    .inner {
+      text-align: left;
+      
+      .description {
+        padding: 0;
+      }
+      
+      .button-group {
+        justify-content: flex-start;
+      }
+    }
+  }
+  
+  &.hero-no-overlay {
+    &::before {
+      display: none;
+    }
+  }
+  
+  &.hero-light-overlay {
+    &::before {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// Compatibilidad con modo claro
+body.active-light-mode {
+  .hero-background {
+    &::before {
+      background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .inner {
+      .title {
+        color: var(--color-dark);
+      }
+      
+      .description {
+        color: var(--color-gray);
+      }
+    }
+  }
+}

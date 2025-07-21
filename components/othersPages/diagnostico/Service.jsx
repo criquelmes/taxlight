@@ -1,8 +1,6 @@
 import React from "react";
 import Link from "next/link";
-
 import { serviceData2 } from "../../../data/service";
-import Image from "next/image";
 
 export default function Service() {
   return (
@@ -66,27 +64,16 @@ export default function Service() {
                 className="col-lg-4 col-md-6 col-sm-6 col-12"
                 data-sal="slide-up"
                 data-sal-duration={service.salDuration}
-                data-sal-delay={service.salDelay || 0} // Default to 0 if not provided
+                data-sal-delay={service.salDelay || 0}
               >
                 <div className="service service__style--2 text-center">
                   <div className="inner">
-                    <div className="image">
-                      {/* <Image
-                        alt="card Images"
-                        src={service.imageSrc}
-                        width={service.width}
-                        height={service.height}
-                        style={{ width: "fit-content" }}
-                      /> */}
-                    </div>
+                    <div className="image"></div>
                     <div className="content">
                       <h4 className="title">
                         <a href="#">{service.title}</a>
                       </h4>
-                      <p
-                        className="description b1 color-gray mb--0"
-                        // style={{ textAlign: "left" }}
-                      >
+                      <p className="description b1 color-gray mb--0">
                         {service.description}
                       </p>
                     </div>

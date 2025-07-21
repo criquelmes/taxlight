@@ -1,0 +1,178 @@
+// Estilos adicionales para el checkout usando tu sistema SASS existente
+.payment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  span {
+    margin-right: 10px;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-primary);
+  }
+}
+
+.order-summary-section {
+  .title {
+    color: var(--color-heading);
+    font-weight: var(--p-semi-bold);
+  }
+}
+
+.rainbow-order-summary {
+  background: var(--color-blackest);
+  border-radius: var(--radius);
+  padding: 40px;
+  box-shadow: var(--shadow-lighter);
+  
+  .single-list-wrapper {
+    .single-list {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--color-border);
+      
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:nth-last-child(2) {
+        border-bottom: none;
+      }
+      
+      &.total-row {
+        border-top: 2px solid var(--color-border);
+        margin-top: 20px;
+        padding-top: 20px;
+        font-weight: var(--p-bold);
+        font-size: var(--font-size-b1);
+        
+        .total-amount {
+          color: var(--color-primary);
+          font-size: 24px;
+          font-weight: var(--p-extra-bold);
+        }
+      }
+      
+      label {
+        color: var(--color-body);
+        font-weight: var(--p-medium);
+        margin: 0;
+        font-size: var(--font-size-b2);
+      }
+      
+      span {
+        color: var(--color-heading);
+        font-weight: var(--p-medium);
+        font-size: var(--font-size-b2);
+      }
+    }
+  }
+}
+
+.security-badge {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--color-success);
+  background: rgba(62, 183, 94, 0.1);
+  border: 1px solid rgba(62, 183, 94, 0.3);
+  border-radius: var(--radius-small);
+  padding: 20px;
+  margin-top: 30px;
+  
+  .security-icon {
+    width: 35px;
+    height: 35px;
+    background: var(--color-success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    flex-shrink: 0;
+  }
+  
+  .security-text {
+    .security-title {
+      font-weight: var(--p-semi-bold);
+      color: var(--color-success);
+      margin: 0 0 5px 0;
+      font-size: var(--font-size-b3);
+    }
+    
+    .security-subtitle {
+      color: var(--color-success);
+      margin: 0;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+  }
+}
+
+// Mejoras para formularios usando tus variables
+.edu-contact-form {
+  .form-group {
+    margin-bottom: 30px;
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: var(--p-semi-bold);
+      color: var(--color-heading);
+      font-size: var(--font-size-b2);
+    }
+    
+    input {
+      width: 100%;
+      padding: 15px 20px;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: var(--font-size-b2);
+      background: transparent;
+      color: var(--color-body);
+      transition: var(--transition);
+      height: 60px;
+      
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+      }
+      
+      &::placeholder {
+        color: var(--color-body);
+        opacity: 0.7;
+      }
+    }
+  }
+}
+
+// Responsive usando tus breakpoints
+@media only screen and (max-width: 767px) {
+  .rainbow-order-summary {
+    padding: 30px 20px;
+    
+    .single-list-wrapper .single-list {
+      padding: 12px 0;
+      
+      &.total-row {
+        padding-top: 15px;
+        margin-top: 15px;
+      }
+    }
+  }
+  
+  .security-badge {
+    padding: 15px;
+    gap: 12px;
+  }
+  
+  .payment-button {
+    span {
+      margin-right: 8px;
+    }
+  }
+}

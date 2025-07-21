@@ -31,7 +31,6 @@ export default function TyperComponent({
       }, 600);
     }, 3000);
 
-    // Cleanup function to destroy the Typed instance
     return () => {
       clearInterval(reapetTyping);
     };
