@@ -33,13 +33,10 @@ export default function OrderSummary({
 
   const theme = useTheme();
 
-  // Efecto para establecer el tipo de suscripción basado en los parámetros de la URL
   useEffect(() => {
     if (selectedType) {
-      // Si viene el tipo desde la URL, usarlo
       setSubscriptionType(selectedType as "monthly" | "annual");
     } else if (selectedTitle) {
-      // Si no viene el tipo pero sí el título, inferir desde el título
       const title = selectedTitle.toLowerCase();
       if (title.includes("mensual") || title.includes("mes")) {
         setSubscriptionType("monthly");
@@ -85,7 +82,7 @@ export default function OrderSummary({
   };
 
   const getSelectedProducts = () => {
-    const products = ["Astrobot"]; // Siempre incluido
+    const products = ["Astrobot"];
     if (includeBite) {
       products.push("Bite");
     }
@@ -94,25 +91,20 @@ export default function OrderSummary({
 
   const isDark = theme === "dark";
 
-  // Función modificada para incluir el estado de productos
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    // Agregar información de productos al FormData
     formData.set("includeBite", includeBite.toString());
     formData.set("selectedProducts", getSelectedProducts().join(","));
 
     try {
-      // ✅ CORRECCIÓN: Llamar como función async en lugar de action
       const result = await onSubscribe(formData);
 
       if (result.success && result.redirectUrl) {
-        // Redirigir a MercadoPago en el cliente
         console.log(`🚀 Redirigiendo a MercadoPago: ${result.redirectUrl}`);
         window.location.href = result.redirectUrl;
       } else {
-        // Manejar error
         console.error("Error en suscripción:", result.error);
         alert(`Error: ${result.error}`);
       }
