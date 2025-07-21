@@ -35,7 +35,7 @@ export default function Faq() {
               </p>
 
               <div className="read-more-btn mt--50">
-                <Link className="btn-default btn-icon" href={`#`}>
+                <Link className="btn-default btn-icon" href={"/faq"}>
                   Ver más <i className="icon feather-arrow-right" />
                 </Link>
               </div>

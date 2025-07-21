@@ -3,8 +3,14 @@ import React from "react";
 export default function Hero() {
   return (
     <div
-      className="slider-area slider-style-1 variation-default height-850 bg_image bg_image--12"
+      className="slider-area slider-style-1 variation-default height-950"
       data-black-overlay={7}
+      style={{
+        backgroundImage: "url('/assets/images/bg/hero-about.jpg')",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+      }}
     >
       <div className="container">
         <div className="row">
@@ -15,14 +21,7 @@ export default function Hero() {
               data-sal-duration={400}
               data-sal-delay={150}
             >
-              <div>
-                <h3 className="rainbow-sub-badge">
-                  <span className="theme-gradient">
-                    Tu asistente tributario
-                  </span>
-                </h3>
-              </div>
-              <h1 className="title display-one">Astrobot</h1>
+              <h1 className="title display-one">Quiénes Somos</h1>
             </div>
           </div>
         </div>

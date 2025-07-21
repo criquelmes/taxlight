@@ -1,5 +1,4 @@
 import Error from "../components/elements/Error";
-// import Error from "@/components/elements/Error";
 
 import Footer3 from "../components/footers/Footer3";
 import Header2 from "../components/headers/Header2";

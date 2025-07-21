@@ -1,7 +1,7 @@
 import Footer3 from "../../components/footers/Footer3";
 import Header2 from "../../components/headers/Header2";
 
-import Hero from "../../components/othersPages/about/Hero";
+import Hero from "../../components/othersPages/astrobot/Hero";
 import HowWorks from "../../components/othersPages/about/HowWorks";
 import Service from "../../components/othersPages/astrobot/Service";
 import TemplateSlider from "../../components/othersPages/astrobot/TemplateSlider";
@@ -15,7 +15,7 @@ export const metadata = {
 export default function page() {
   return (
     <>
-      <Header2 parentClass="rainbow-header header-default header-transparent header-sticky" />
+      <Header2 parentClass="rainbow-header header-default header-sticky" />
       <div>
         <div className="rainbow-gradient-circle" />
         <div className="rainbow-gradient-circle theme-pink" />

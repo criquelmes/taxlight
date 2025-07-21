@@ -8,10 +8,10 @@ import React, { useEffect, useRef } from "react";
 
 export default function MobileMenu() {
   const pathname = usePathname();
-  const popupRef = useRef(null); // For .popup-mobile-menu
-  const innerRef = useRef(null); // For .inner
+  const popupRef = useRef(null);
+  const innerRef = useRef(null);
 
-  const menuRefs = useRef([]); // To store references to all menu items
+  const menuRefs = useRef([]);
   const handleMenuClick = (index) => {
     menuRefs.current.forEach((menu, idx) => {
       if (menu) {
@@ -32,9 +32,7 @@ export default function MobileMenu() {
             }
           }
         } else {
-          // Remove 'active' class from all other menus
           menu.classList.remove("open");
-          // Remove 'open' class from the next sibling elements
           const nextElement = menu.nextElementSibling;
           if (nextElement) {
             nextElement.style.height = "0px";
@@ -44,7 +42,6 @@ export default function MobileMenu() {
     });
   };
 
-  // Handler for clicking outside of .inner
   const handleOutsideClick = (e) => {
     if (
       popupRef.current &&
@@ -53,16 +50,13 @@ export default function MobileMenu() {
       !innerRef.current.contains(e.target)
     ) {
       closeMenu();
-      // Add your logic to handle outside click here
     }
   };
 
   useEffect(() => {
-    // Attach the event listener for outside clicks
     document.addEventListener("click", handleOutsideClick);
 
     return () => {
-      // Cleanup the event listener when the component unmounts
       document.removeEventListener("click", handleOutsideClick);
     };
   }, []);
@@ -142,7 +136,7 @@ export default function MobileMenu() {
                 </Link>
               ) : (
                 <a
-                  ref={(el) => (menuRefs.current[index] = el)} // Store refs for each menu item
+                  ref={(el) => (menuRefs.current[index] = el)}
                   onClick={() => handleMenuClick(index)}
                 >
                   <span className={isActiveParent(item) ? "activeParent" : ""}>

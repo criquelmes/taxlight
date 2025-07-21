@@ -13,36 +13,13 @@ export const socialLinks = [
   },
 ];
 
-export const socialLinksWithSal = [
-  {
-    href: "https://www.facebook.com/",
-    iconClass: "feather-facebook",
-    salDelay: 200,
-  },
-  {
-    href: "https://www.twitter.com",
-    iconClass: "feather-twitter",
-    salDelay: 300,
-  },
-  {
-    href: "https://www.instagram.com/",
-    iconClass: "feather-instagram",
-    salDelay: 400,
-  },
-  {
-    href: "https://www.linkdin.com/",
-    iconClass: "feather-linkedin",
-    salDelay: 500,
-  },
-];
-
 export const footerSections = [
   {
     title: "Servicios",
     links: [
-      { href: "#", label: "Astrobot" },
-      { href: "#", label: "Diagnóstico Tributario" },
-      { href: "#", label: "Estructuración Tributaria" },
+      { href: "/astrobot", label: "Astrobot" },
+      { href: "/diagnostico", label: "Diagnóstico Tributario" },
+      { href: "/estructuracion", label: "Estructuración Tributaria" },
     ],
   },
 ];

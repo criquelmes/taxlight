@@ -1356,7 +1356,7 @@ iframe {
 }
 
 .bg_image--1 {
-  background-image: url(/assets/images/bg/bg-image-1.jpg);
+  background-image: url(/assets/images/bg/hero-about.jpg);
 }
 
 .bg_image--2 {
@@ -1400,7 +1400,7 @@ iframe {
 }
 
 .bg_image--12 {
-  background-image: url(/assets/images/bg/bg-image-12.jpg);
+  background-image: url(/assets/images/bg/astrobot-left.png);
 }
 
 .bg_image--13 {
@@ -9441,7 +9441,7 @@ xclip
 }
 .header-top-news.bg-image1,
 .header-top-news-2.bg-image1 {
-  background-image: url(/assets/images/header-top/top-banner.png);
+  /* background-image: url(/assets/images/header-top/top-banner.png); */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -9528,7 +9528,7 @@ xclip
 }
 
 .header-top-news-2 .bg-image1 {
-  background-image: url(/assets/images/header-top/top-banner.png);
+  /* background-image: url(/assets/images/header-top/top-banner.png); */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -10104,7 +10104,7 @@ div.btn-default.btn-extra-large {
 a.btn-default.btn-border,
 button.btn-default.btn-border,
 div.btn-default.btn-border {
-  background-image: inherit;
+  /* background-image: inherit; */
   border-color: var(--color-border);
   border-width: 2px;
   border-style: solid;
@@ -14997,8 +14997,8 @@ iframe {
 
 .slider-area .inner a.btn-default.btn-border,
 .slider-area .inner button.btn-default.btn-border {
-  border-color: var(--color-border);
-  color: var(--color-white);
+  border-color: var(--color-border) !important;
+  color: var(--color-primary) !important;
 }
 
 /*-----------------------
@@ -16789,4 +16789,9 @@ body.active-light-mode
 /*# sourceMappingURL=../maps/style.css.map */
 .logo img {
   width: fit-content;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Ajusta según tu navbar */
 }

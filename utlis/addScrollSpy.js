@@ -4,7 +4,6 @@ const addScrollspy = (
   activeClass = "current"
 ) => {
   var section = document.querySelectorAll(".scrollSpySection");
-  // console.log(section);
 
   var sections = {};
   var i = 0;

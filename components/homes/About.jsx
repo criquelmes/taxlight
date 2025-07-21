@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import TyperComponent from "../common/TyperComponent";
 import Link from "next/link";
 export default function About() {
   return (
@@ -39,7 +38,7 @@ export default function About() {
                 </h2>
                 <p>
                   Con nuestra{" "}
-                  <span className="font-bold text-white">
+                  <span className="font-bold">
                     experiencia en el mundo de los criptoactivos y más de 15
                     años en el ámbito tributario
                   </span>
