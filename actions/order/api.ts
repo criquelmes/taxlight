@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, $Enums } from "@prisma/client";
 import { MercadoPagoConfig, PreApproval } from "mercadopago";
 
 const prisma = new PrismaClient();
@@ -927,7 +927,7 @@ export async function initializeSubscriptionsAndProducts() {
       createdSubscriptions.push(subscription);
     }
 
-    const productTypes = ["ASTROBOT", "BITE"] as const;
+    const productTypes: $Enums.ProductType[] = ["ASTROBOT", "BITE"];
 
     for (const subscription of createdSubscriptions) {
       for (const productType of productTypes) {
