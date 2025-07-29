@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useTheme } from "../../hooks/useTheme";
 import MercadoPagoIcon from "/public/assets/images/logo/Mercado-Pago.svg";
+import DuplicateAccountModal from "../modal/DuplicateAccountModal";
 
 interface OrderSummaryProps {
   onSubscribe: (formData: FormData) => Promise<{
@@ -30,6 +31,10 @@ export default function OrderSummary({
     "monthly" | "annual"
   >("annual");
   const [includeBite, setIncludeBite] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [showDuplicateModal, setShowDuplicateModal] = useState<boolean>(false);
+  const [duplicateEmail, setDuplicateEmail] = useState<string>("");
 
   const theme = useTheme();
 
@@ -45,6 +50,25 @@ export default function OrderSummary({
       }
     }
   }, [selectedType, selectedTitle]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showDuplicateModal) {
+        handleCloseDuplicateModal();
+      }
+    };
+
+    if (showDuplicateModal) {
+      document.addEventListener("keydown", handleEscape);
+      // Prevenir scroll del body cuando el modal está abierto
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [showDuplicateModal]);
 
   const formatDate = () => {
     const today = new Date();
@@ -93,6 +117,11 @@ export default function OrderSummary({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Evitar múltiples envíos
+    if (isLoading) return;
+
+    setIsLoading(true);
     const formData = new FormData(e.currentTarget);
 
     formData.set("includeBite", includeBite.toString());
@@ -106,12 +135,58 @@ export default function OrderSummary({
         window.location.href = result.redirectUrl;
       } else {
         console.error("Error en suscripción:", result.error);
-        alert(`Error: ${result.error}`);
+
+        // 🔥 NUEVA LÓGICA: Verificar si es error de cuenta duplicada
+        if (
+          result.error &&
+          result.error.includes("Ya tienes una cuenta activa")
+        ) {
+          const email = formData.get("email") as string;
+          setDuplicateEmail(email);
+          setShowDuplicateModal(true);
+        } else {
+          // Otros errores -> alert o redirigir a página de error
+          alert(`Error: ${result.error}`);
+        }
+
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error enviando formulario:", error);
-      alert("Error procesando la suscripción");
+
+      // 🔥 NUEVA LÓGICA: También manejar errores de catch (por si acaso)
+      if (
+        error instanceof Error &&
+        error.message.includes("Ya tienes una cuenta activa")
+      ) {
+        const email = formData.get("email") as string;
+        setDuplicateEmail(email);
+        setShowDuplicateModal(true);
+      } else {
+        alert("Error procesando la suscripción");
+      }
+
+      setIsLoading(false);
     }
+  };
+
+  const handleTryAgain = () => {
+    setShowDuplicateModal(false);
+    setDuplicateEmail("");
+
+    // Limpiar el campo de email
+    const emailInput = document.querySelector(
+      'input[name="email"]'
+    ) as HTMLInputElement;
+    if (emailInput) {
+      emailInput.value = "";
+      emailInput.focus();
+    }
+  };
+
+  const handleCloseDuplicateModal = () => {
+    setShowDuplicateModal(false);
+    setDuplicateEmail("");
   };
 
   return (
@@ -140,6 +215,7 @@ export default function OrderSummary({
                 name="email"
                 type="email"
                 placeholder="tu@email.com"
+                disabled={isLoading}
               />
               <span className="focus-border" />
             </div>
@@ -157,6 +233,7 @@ export default function OrderSummary({
                 name="name"
                 type="text"
                 placeholder="Tu nombre completo"
+                disabled={isLoading}
               />
               <span className="focus-border" />
             </div>
@@ -177,6 +254,7 @@ export default function OrderSummary({
                 }
                 className="select-field"
                 required
+                disabled={isLoading}
                 style={{
                   color: theme === "light" ? "#000" : "inherit",
                   borderColor: theme === "light" ? "#ccc" : "#555",
@@ -196,6 +274,7 @@ export default function OrderSummary({
                   name="bite"
                   checked={includeBite}
                   onChange={(e) => setIncludeBite(e.target.checked)}
+                  disabled={isLoading}
                 />
                 <span className="bite-checkmark"></span>
                 <span className="bite-text">Agregar Bite al plan</span>
@@ -334,16 +413,28 @@ export default function OrderSummary({
             <div className="form-submit-group mt--30">
               <button
                 type="submit"
-                className="btn-default btn-large w-100 payment-button"
+                disabled={isLoading}
+                className={`btn-default btn-large w-100 payment-button ${
+                  isLoading ? "loading" : ""
+                }`}
               >
-                <span>Ir a pagar</span>
-                <Image
-                  src={MercadoPagoIcon}
-                  alt="Mercado Pago"
-                  width={32}
-                  height={24}
-                  className="ml--10"
-                />
+                {isLoading ? (
+                  <span className="loading-content">
+                    <span className="spinner"></span>
+                    <span>Procesando...</span>
+                  </span>
+                ) : (
+                  <>
+                    <span>Ir a pagar</span>
+                    <Image
+                      src={MercadoPagoIcon}
+                      alt="Mercado Pago"
+                      width={32}
+                      height={24}
+                      className="ml--10"
+                    />
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -358,6 +449,8 @@ export default function OrderSummary({
           gap: 12px;
           color: ${theme === "light" ? "#000" : "inherit"};
           flex-direction: row !important;
+          opacity: ${isLoading ? "0.6" : "1"};
+          pointer-events: ${isLoading ? "none" : "auto"};
         }
 
         .bite-checkbox-container input[type="checkbox"] {
@@ -416,7 +509,52 @@ export default function OrderSummary({
         .bite-checkbox-container:hover .bite-checkmark {
           border-color: var(--color-primary) !important;
         }
+
+        /* Estilos para el estado de carga */
+        .payment-button.loading {
+          opacity: 0.8;
+          cursor: not-allowed;
+        }
+
+        .loading-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+        }
+
+        .spinner {
+          width: 20px;
+          height: 20px;
+          border: 2px solid transparent;
+          border-top: 2px solid currentColor;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* Deshabilitar inputs cuando está cargando */
+        input:disabled,
+        select:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
       `}</style>
+
+      <DuplicateAccountModal
+        isOpen={showDuplicateModal}
+        onClose={handleCloseDuplicateModal}
+        email={duplicateEmail}
+        onTryAgain={handleTryAgain}
+      />
     </form>
   );
 }
