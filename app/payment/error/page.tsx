@@ -1,10 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "../../../hooks/useTheme";
 import { useEffect, useState } from "react";
 
-export default function PaymentError() {
+// Componente que usa useSearchParams - DEBE estar en Suspense
+function PaymentErrorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const theme = useTheme();
@@ -268,14 +270,14 @@ export default function PaymentError() {
         }
 
         h1 {
-          font-size: 2.5rem; /* Aumentado de 2rem a 2.5rem */
+          font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
         }
 
         .subtitle {
-          font-size: 1.5rem; /* Aumentado de 1.125rem a 1.5rem */
+          font-size: 1.5rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           margin-bottom: 2rem;
           line-height: 1.5;
@@ -289,7 +291,7 @@ export default function PaymentError() {
           border-radius: 8px;
           padding: 1rem;
           margin-bottom: 1.5rem;
-          font-size: 1rem; /* Aumentado de 0.9rem a 1rem */
+          font-size: 1rem;
         }
 
         .plan-info p {
@@ -308,11 +310,11 @@ export default function PaymentError() {
         }
 
         .error-details h3 {
-          font-size: 1.25rem; /* Aumentado de 1.1rem a 1.25rem */
+          font-size: 1.25rem;
           font-weight: 600;
           margin-bottom: 1rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
-          text-align: center; /* 🎯 CENTRADO DEL TÍTULO */
+          text-align: center;
         }
 
         .error-details ul {
@@ -326,7 +328,7 @@ export default function PaymentError() {
           position: relative;
           padding-left: 1.5rem;
           color: ${theme === "dark" ? "#d1d5db" : "#4b5563"};
-          font-size: 1.125rem; /* Aumentado el tamaño de la lista */
+          font-size: 1.125rem;
         }
 
         .error-details li::before {
@@ -342,17 +344,17 @@ export default function PaymentError() {
           gap: 1rem;
           margin-bottom: 1.5rem;
           flex-direction: column;
-          justify-content: center; /* 🎯 CENTRADO DE BOTONES */
+          justify-content: center;
         }
 
         .btn-primary {
           background: var(--color-primary);
           color: white;
           border: none;
-          padding: 0.875rem 1.75rem; /* Aumentado padding */
+          padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1.5rem; /* Aumentado de tamaño por defecto a 1.5rem */
+          font-size: 1.5rem;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -365,10 +367,10 @@ export default function PaymentError() {
           background: transparent;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           border: 1px solid ${theme === "dark" ? "#374151" : "#d1d5db"};
-          padding: 0.875rem 1.75rem; /* Aumentado padding */
+          padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1.5rem; /* Aumentado tamaño */
+          font-size: 1.5rem;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -380,7 +382,7 @@ export default function PaymentError() {
         }
 
         .support-info {
-          font-size: 1.125rem; /* Aumentado de 0.875rem a 1.125rem */
+          font-size: 1.125rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           border-top: 1px solid ${theme === "dark" ? "#374151" : "#e5e7eb"};
           padding-top: 1rem;
@@ -390,13 +392,93 @@ export default function PaymentError() {
           margin: 0.25rem 0;
         }
 
+        .loading-spinner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f4f6;
+          border-top: 4px solid var(--color-primary, #3b82f6);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
         @media (min-width: 640px) {
           .action-buttons {
             flex-direction: row;
-            justify-content: center; /* 🎯 MANTENER CENTRADO EN DESKTOP */
+            justify-content: center;
           }
         }
       `}</style>
     </div>
+  );
+}
+
+// Componente de loading para Suspense
+function PaymentErrorLoading() {
+  return (
+    <div className="payment-loading">
+      <div className="loading-spinner"></div>
+      <p>Cargando información del error...</p>
+
+      <style jsx>{`
+        .payment-loading {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          background: #f8fafc;
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f4f6;
+          border-top: 4px solid #3b82f6;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        p {
+          color: #6b7280;
+          font-size: 1rem;
+          margin: 0;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Componente principal - ENVUELTO EN SUSPENSE
+export default function PaymentError() {
+  return (
+    <Suspense fallback={<PaymentErrorLoading />}>
+      <PaymentErrorContent />
+    </Suspense>
   );
 }

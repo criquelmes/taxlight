@@ -1,10 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "../../../hooks/useTheme";
 import { useEffect, useState } from "react";
 
-export default function PaymentPending() {
+// Componente que usa useSearchParams - DEBE estar en Suspense
+function PaymentPendingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const theme = useTheme();
@@ -252,14 +254,14 @@ export default function PaymentPending() {
         }
 
         h1 {
-          font-size: 2.5rem; /* Aumentado de 2rem a 2.5rem */
+          font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
         }
 
         .subtitle {
-          font-size: 1.5rem; /* Aumentado de 1.125rem a 1.5rem */
+          font-size: 1.5rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           margin-bottom: 2rem;
           line-height: 1.5;
@@ -273,7 +275,7 @@ export default function PaymentPending() {
           border-radius: 8px;
           padding: 1rem;
           margin-bottom: 1.5rem;
-          font-size: 1rem; /* Aumentado de 0.9rem a 1rem */
+          font-size: 1rem;
         }
 
         .plan-info p {
@@ -292,7 +294,7 @@ export default function PaymentPending() {
         }
 
         .status-info h3 {
-          font-size: 1.25rem; /* Aumentado de 1.1rem a 1.25rem */
+          font-size: 1.25rem;
           font-weight: 600;
           margin-bottom: 1rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
@@ -343,12 +345,12 @@ export default function PaymentPending() {
           display: block;
           color: ${theme === "dark" ? "white" : "#1f2937"};
           margin-bottom: 0.25rem;
-          font-size: 1.125rem; /* Aumentado tamaño del texto fuerte */
+          font-size: 1.125rem;
         }
 
         .step-text p {
           margin: 0;
-          font-size: 1rem; /* Aumentado de 0.9rem a 1rem */
+          font-size: 1rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
         }
 
@@ -369,7 +371,7 @@ export default function PaymentPending() {
           border-radius: 8px;
           padding: 1rem;
           margin-bottom: 1.5rem;
-          font-size: 1rem; /* Aumentado de 0.9rem a 1rem */
+          font-size: 1rem;
           color: ${theme === "dark" ? "#93c5fd" : "#1d4ed8"};
         }
 
@@ -395,17 +397,17 @@ export default function PaymentPending() {
           gap: 1rem;
           margin-bottom: 1.5rem;
           flex-direction: column;
-          justify-content: center; /* 🎯 CENTRADO DE BOTONES */
+          justify-content: center;
         }
 
         .btn-primary {
           background: var(--color-primary);
           color: white;
           border: none;
-          padding: 0.875rem 1.75rem; /* Aumentado padding */
+          padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1.5rem; /* Aumentado tamaño */
+          font-size: 1.5rem;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -423,10 +425,10 @@ export default function PaymentPending() {
           background: transparent;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           border: 1px solid ${theme === "dark" ? "#374151" : "#d1d5db"};
-          padding: 0.875rem 1.75rem; /* Aumentado padding */
+          padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1.5rem; /* Aumentado tamaño */
+          font-size: 1.5rem;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -448,7 +450,7 @@ export default function PaymentPending() {
         }
 
         .important-info h4 {
-          font-size: 1.25rem; /* Aumentado de 1rem a 1.25rem */
+          font-size: 1.25rem;
           font-weight: 600;
           margin-bottom: 1rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
@@ -465,7 +467,7 @@ export default function PaymentPending() {
           position: relative;
           padding-left: 1.5rem;
           color: ${theme === "dark" ? "#d1d5db" : "#4b5563"};
-          font-size: 1.125rem; /* Aumentado de 0.9rem a 1.125rem */
+          font-size: 1.125rem;
         }
 
         .important-info li::before {
@@ -477,7 +479,7 @@ export default function PaymentPending() {
         }
 
         .support-info {
-          font-size: 1.125rem; /* Aumentado de 0.875rem a 1.125rem */
+          font-size: 1.125rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           border-top: 1px solid ${theme === "dark" ? "#374151" : "#e5e7eb"};
           padding-top: 1rem;
@@ -516,10 +518,65 @@ export default function PaymentPending() {
         @media (min-width: 640px) {
           .action-buttons {
             flex-direction: row;
-            justify-content: center; /* 🎯 MANTENER CENTRADO EN DESKTOP */
+            justify-content: center;
           }
         }
       `}</style>
     </div>
+  );
+}
+
+// Componente de loading para Suspense
+function PaymentPendingLoading() {
+  return (
+    <div className="payment-loading">
+      <div className="loading-spinner"></div>
+      <p>Cargando estado del pago...</p>
+
+      <style jsx>{`
+        .payment-loading {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          background: #f8fafc;
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f4f6;
+          border-top: 4px solid #f59e0b;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        p {
+          color: #6b7280;
+          font-size: 1rem;
+          margin: 0;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Componente principal - ENVUELTO EN SUSPENSE
+export default function PaymentPending() {
+  return (
+    <Suspense fallback={<PaymentPendingLoading />}>
+      <PaymentPendingContent />
+    </Suspense>
   );
 }

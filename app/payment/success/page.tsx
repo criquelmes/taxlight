@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "../../../hooks/useTheme";
@@ -13,7 +14,8 @@ interface PaymentDetails {
   products?: string[];
 }
 
-export default function PaymentSuccess() {
+// Componente que usa useSearchParams - DEBE estar en Suspense
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const theme = useTheme();
@@ -287,14 +289,14 @@ export default function PaymentSuccess() {
         }
 
         h1 {
-          font-size: 2.5rem; /* Aumentado de 2rem a 2.5rem */
+          font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
         }
 
         .subtitle {
-          font-size: 1.5rem; /* Aumentado de 1.125rem a 1.25rem */
+          font-size: 1.5rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           margin-bottom: 2rem;
         }
@@ -305,7 +307,7 @@ export default function PaymentSuccess() {
           border-radius: 8px;
           padding: 1rem;
           margin-bottom: 1.5rem;
-          font-size: 1rem; /* Aumentado de 0.9rem a 1rem */
+          font-size: 1rem;
           color: ${theme === "dark" ? "#fbbf24" : "#d97706"};
         }
 
@@ -323,7 +325,7 @@ export default function PaymentSuccess() {
           display: flex;
           justify-content: space-between;
           margin-bottom: 0.75rem;
-          font-size: 1.5rem; /* Aumentado de 0.95rem a 1.05rem */
+          font-size: 1.5rem;
         }
 
         .detail-row:last-child {
@@ -343,17 +345,17 @@ export default function PaymentSuccess() {
           display: flex;
           gap: 1rem;
           margin-bottom: 1.5rem;
-          justify-content: center; /* 🎯 CENTRADO DEL BOTÓN */
+          justify-content: center;
         }
 
         .btn-primary {
           background: var(--color-primary);
           color: white;
           border: none;
-          padding: 0.875rem 1.75rem; /* Aumentado padding */
+          padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1.5rem; /* Aumentado de tamaño por defecto a 1.1rem */
+          font-size: 1.5rem;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -380,7 +382,7 @@ export default function PaymentSuccess() {
         }
 
         .footer-text {
-          font-size: 1.125rem; /* Aumentado de 0.875rem a 1rem */
+          font-size: 1.125rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           margin: 0;
         }
@@ -413,10 +415,65 @@ export default function PaymentSuccess() {
 
         @media (min-width: 640px) {
           .action-buttons {
-            justify-content: center; /* 🎯 MANTENER CENTRADO EN DESKTOP */
+            justify-content: center;
           }
         }
       `}</style>
     </div>
+  );
+}
+
+// Componente de loading para Suspense
+function PaymentSuccessLoading() {
+  return (
+    <div className="payment-loading">
+      <div className="loading-spinner"></div>
+      <p>Cargando confirmación del pago...</p>
+
+      <style jsx>{`
+        .payment-loading {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          background: #f8fafc;
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f4f6;
+          border-top: 4px solid #10b981;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        p {
+          color: #6b7280;
+          font-size: 1rem;
+          margin: 0;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Componente principal - ENVUELTO EN SUSPENSE
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={<PaymentSuccessLoading />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
