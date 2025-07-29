@@ -1,5 +1,7 @@
-import { services } from "@/data/service";
+"use client";
 import React from "react";
+import { IconRenderer } from "../../utlis/iconMapper";
+import { services } from "../../data/service";
 
 export default function Services() {
   return (
@@ -36,11 +38,16 @@ export default function Services() {
             >
               <div className="service service__style--1 bg-color-blackest radius mt--20 rbt-border text-start">
                 <div className="icon">
-                  <i className={service.icon} />
+                  <IconRenderer
+                    iconName={service.icon}
+                    size={45}
+                    color="var(--color-primary)"
+                    className="service-icon"
+                  />
                 </div>
                 <div className="content">
                   <h4 className="title w-600">
-                    <a href="#">{service.title}</a>
+                    <a href={service.url}>{service.title}</a>
                   </h4>
                   <p className="description b1 color-gray mb--0">
                     {service.description}{" "}

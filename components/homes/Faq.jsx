@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import TyperComponent from "@/components/common/TyperComponent";
+import TyperComponent from "../common/TyperComponent";
 export default function Faq() {
   return (
     <div className="rainbow-company-mission-are rainbow-section-gap">
@@ -35,7 +35,7 @@ export default function Faq() {
               </p>
 
               <div className="read-more-btn mt--50">
-                <Link className="btn-default btn-icon" href={`#`}>
+                <Link className="btn-default btn-icon" href={"/faq"}>
                   Ver más <i className="icon feather-arrow-right" />
                 </Link>
               </div>

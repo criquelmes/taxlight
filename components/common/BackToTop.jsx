@@ -19,15 +19,13 @@ export default function BackToTop() {
       event.preventDefault();
       window.scrollTo({
         top: 0,
-        behavior: "smooth", // Linear easing replacement
+        behavior: "smooth",
       });
     };
 
-    // Add scroll and click event listeners
     window.addEventListener("scroll", handleScroll);
     scrollTop.addEventListener("click", scrollToTop);
 
-    // Cleanup function to remove event listeners
     return () => {
       window.removeEventListener("scroll", handleScroll);
       scrollTop.removeEventListener("click", scrollToTop);

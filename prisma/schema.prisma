@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id   String      @id @default(cuid())
+  name ProductType
+
+  // Relación one-to-many: un producto pertenece a una suscripción
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String
+
+  @@unique([name, subscriptionId])
+  @@index([name])
+  @@index([subscriptionId])
+  @@map("products")
+}
+
+model Subscription {
+  id        String           @id @default(cuid())
+  name      String           @unique
+  price     Float
+  duration  Int              @default(1)
+  type      SubscriptionType @default(MONTHLY)
+  isActive  Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  // Relaciones
+  products           Product[]
+  orderSubscriptions OrderSubscription[]
+
+  @@index([name])
+  @@index([type])
+  @@index([isActive])
+  @@map("subscriptions")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  orders Order[]
+
+  @@index([email])
+  @@index([isActive])
+  @@map("users")
+}
+
+model Order {
+  id       String    @id @default(cuid())
+  subtotal Float
+  tax      Float
+  total    Float
+  isPaid   Boolean   @default(false)
+  paidAt   DateTime?
+
+  startsAt      DateTime?
+  expiresAt     DateTime?
+  isActive      Boolean   @default(false)
+  autoRenew     Boolean   @default(true)
+  lastCheckedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relaciones
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  orderSubscriptions OrderSubscription[]
+
+  transactionId    String?
+  mpSubscriptionId String?
+
+  @@index([userId])
+  @@index([isPaid])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderSubscription {
+  id       String @id @default(cuid())
+  price    Float
+  quantity Int    @default(1)
+
+  // Nuevos campos para tracking
+  startDate    DateTime  @default(now())
+  endDate      DateTime?
+  isActive     Boolean   @default(false)
+  renewalCount Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String
+
+  @@unique([orderId, subscriptionId])
+  @@index([orderId])
+  @@index([subscriptionId])
+  @@index([isActive])
+  @@index([endDate])
+  @@map("order_subscriptions")
+}
+
+// logs de auditoría
+model SubscriptionLog {
+  id        String             @id @default(cuid())
+  action    SubscriptionAction
+  orderId   String
+  userId    String
+  details   String?
+  createdAt DateTime           @default(now())
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("subscription_logs")
+}
+
+enum SubscriptionType {
+  MONTHLY
+  YEARLY
+}
+
+enum ProductType {
+  ASTROBOT
+  BITE
+}
+
+enum SubscriptionAction {
+  CREATED
+  ACTIVATED
+  RENEWED
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+  REACTIVATED
+}

@@ -83,3 +83,69 @@ a {
 .success-message {
   color: green;
 }
+
+// Topbar flotante - aparece al hacer scroll
+.floating-topbar {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  right: 20px;
+  z-index: 9998; // Menor que el botón back-to-top
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  transform: translateY(100px);
+  opacity: 0;
+  visibility: hidden;
+  padding: 0;
+  overflow: hidden;
+
+  &.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    animation: slideUp 0.3s ease-out;
+  }
+
+  // Hacer el topbar un poco más pequeño en versión flotante
+  > div {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+
+  // Modo oscuro
+  .active-dark-mode & {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+
+    > div {
+      transform: scale(0.8);
+    }
+  }
+}
+
+// Asegurar que el botón back-to-top esté por encima
+.rainbow-back-top {
+  z-index: 9999 !important;
+}
+
+// Animación suave al aparecer
+@keyframes slideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
