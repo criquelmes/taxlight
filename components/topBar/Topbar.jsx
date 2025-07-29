@@ -21,7 +21,7 @@ export default function Topbar() {
               <div className="inner">
                 <div className="content">
                   <Link
-                    href="https://astrobot.enkoding.io"
+                    href="https://astrobot.taxlight.cl"
                     target="_blank"
                     className="rainbow-link"
                   >

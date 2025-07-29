@@ -91,15 +91,19 @@ export default function RootLayout({ children }) {
               try {
                 const isDarkmode = localStorage.getItem('isDarkmode');
                 
+                // Si existe la preferencia, usarla
                 if (isDarkmode === 'true') {
                   document.body.className = 'active-dark-mode';
-                } else {
-                  // Por defecto light mode
+                } else if (isDarkmode === 'false') {
                   document.body.className = 'active-light-mode';
+                } else {
+                  // Si no existe preferencia, usar dark mode como predeterminado
+                  document.body.className = 'active-dark-mode';
+                  localStorage.setItem('isDarkmode', 'true');
                 }
               } catch (e) {
-                // Fallback
-                document.body.className = 'active-light-mode';
+                // Fallback a dark mode
+                document.body.className = 'active-dark-mode';
               }
             })();
           `,

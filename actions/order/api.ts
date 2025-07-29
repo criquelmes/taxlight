@@ -97,8 +97,14 @@ async function validateExternalAccount(userData: {
       JSON.stringify(accountData, null, 2)
     );
 
-    // Intentar crear la cuenta para verificar si ya existe
-    const response = await fetch("https://owuii.enkoding.io/accounts", {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL
+      ? `https://${process.env.NEXT_PUBLIC_API_URL}/accounts/`
+      : "https://backend.taxlight.cl/accounts/";
+
+    console.log(`🌐 Validando con: ${backendUrl}`);
+
+    // Intentar crear la cuenta para verificar si ya existe``
+    const response = await fetch(backendUrl, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -169,7 +175,7 @@ async function validateExternalAccount(userData: {
 
 const api = {
   user: {
-    // FUNCIÓN PRINCIPAL DE SUSCRIPCIÓN CON VALIDACIÓN PREVIA
+    // FUNCIÓN PRINCIPAL DE SUSCRIPCIÓN CON VALIDACIÓN PREVIA Y URLs DE RETORNO
     async suscribe(
       email: string,
       name: string,
@@ -257,33 +263,50 @@ const api = {
           console.log(`👤 Usuario existente: ${user.email}`);
         }
 
-        // PASO 5: Crear la suscripción en MercadoPago (solo si validación pasó)
+        // PASO 5: Crear la suscripción en MercadoPago con URLs de retorno configuradas
         const productNames = products
           .map((p) => p.charAt(0) + p.slice(1).toLowerCase())
           .join(" + ");
 
         console.log(`💳 Creando suscripción en MercadoPago...`);
 
+        // 🔥 CONFIGURACIÓN ACTUALIZADA CON URLs DE RETORNO
         const mpSubscription = await new PreApproval(mercadopago).create({
           body: {
-            back_url: process.env.APP_URL!,
+            // URL principal de retorno (actualizada)
+            back_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success`,
+
             reason: `Suscripción ${
               subscriptionType === "annual" ? "Anual" : "Mensual"
             } de ${productNames}`,
+
             auto_recurring: {
               frequency: subscriptionType === "monthly" ? 1 : 12,
               frequency_type: "months",
               transaction_amount: subscription.price,
               currency_id: "CLP",
             },
+
             payer_email: email,
             status: "pending",
+
+            // External reference con información codificada para el webhook
+            external_reference: `sub-${subscriptionType}-${
+              includeBite ? "bite" : "astro"
+            }-${Date.now()}-${email.split("@")[0]}`,
           },
         });
 
         console.log(`✅ Suscripción MercadoPago creada: ${mpSubscription.id}`);
+        console.log(
+          `🔗 External reference: ${mpSubscription.external_reference}`
+        );
 
-        // PASO 6: Crear la orden pendiente con flag de validación
+        // PASO 6: Crear la orden con información codificada para el webhook
+        const encodedInfo = `${subscriptionType}-${
+          includeBite ? "bite" : "astro"
+        }-${user.email}-${mpSubscription.id}`;
+
         const order = await prisma.order.create({
           data: {
             userId: user.id,
@@ -292,6 +315,10 @@ const api = {
             total: subscription.price,
             isPaid: false,
             mpSubscriptionId: mpSubscription.id,
+
+            // Guardar información codificada para recuperar en webhook/verificación
+            transactionId: encodedInfo,
+
             orderSubscriptions: {
               create: {
                 subscriptionId: subscription.id,
@@ -311,12 +338,12 @@ const api = {
           },
         });
 
-        // PASO 7: Log con nota de validación previa
+        // PASO 7: Log con información de URLs configuradas
         await createSubscriptionLog(
           "CREATED",
           order.id,
           user.id,
-          `Suscripción ${subscriptionType} creada con productos: ${productNames} (cuenta externa pre-validada y creada)`
+          `Suscripción ${subscriptionType} creada con productos: ${productNames} (cuenta externa pre-validada). External ref: ${mpSubscription.external_reference}. URLs de retorno configuradas.`
         );
 
         console.log(`✅ Proceso completo - Orden creada: ${order.id}`);
@@ -328,6 +355,8 @@ const api = {
           dbSubscriptionId: subscription.id,
           products: products.map((p) => p.toLowerCase()),
           preValidated: true, // Flag para indicar que ya se validó y creó la cuenta
+          externalReference: mpSubscription.external_reference, // Para tracking
+          backUrlConfigured: true, // Flag para indicar URLs configuradas
         };
       } catch (error) {
         console.error("❌ Error en suscribe:", error);
@@ -1039,6 +1068,192 @@ const api = {
 
     async list(): Promise<Message[]> {
       return [];
+    },
+  },
+  // FUNCIONES HELPER PARA MANEJAR URLs Y PARSING
+  utils: {
+    // Función para parsear external reference del webhook
+    parseExternalReference(externalRef: string) {
+      try {
+        // Formato: sub-{type}-{bite|astro}-{timestamp}-{userPrefix}
+        const parts = externalRef.split("-");
+
+        if (parts.length < 5 || parts[0] !== "sub") {
+          throw new Error("Invalid external reference format");
+        }
+
+        return {
+          subscriptionType: parts[1] as "monthly" | "annual",
+          hasBite: parts[2] === "bite",
+          timestamp: parseInt(parts[3]),
+          userPrefix: parts[4],
+          fullReference: externalRef,
+        };
+      } catch (error) {
+        console.error("❌ Error parsing external reference:", error);
+        return null;
+      }
+    },
+
+    // Función para parsear transaction ID de la orden
+    parseTransactionId(transactionId: string) {
+      try {
+        // Formato: subscriptionType-bite|astro-email-mpSubscriptionId
+        const parts = transactionId.split("-");
+
+        if (parts.length < 4) {
+          throw new Error("Invalid transaction ID format");
+        }
+
+        return {
+          subscriptionType: parts[0] as "monthly" | "annual",
+          hasBite: parts[1] === "bite",
+          email: parts[2],
+          mpSubscriptionId: parts[3],
+        };
+      } catch (error) {
+        console.error("❌ Error parsing transaction ID:", error);
+        return null;
+      }
+    },
+
+    // Función para generar URLs de redirección según estado del pago
+    generateRedirectUrl(
+      status: string,
+      subscriptionType: string,
+      hasBite: boolean
+    ) {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+      const params = new URLSearchParams({
+        plan: subscriptionType,
+        bite: hasBite.toString(),
+      });
+
+      switch (status) {
+        case "approved":
+        case "authorized":
+          return `${baseUrl}/payment/success?${params}`;
+
+        case "rejected":
+        case "cancelled":
+          return `${baseUrl}/payment/error?type=${status}&${params}`;
+
+        case "pending":
+        case "in_process":
+          return `${baseUrl}/payment/pending?${params}`;
+
+        default:
+          return `${baseUrl}/payment/error?type=unknown&${params}`;
+      }
+    },
+
+    // Función para verificar estado de suscripción en MercadoPago
+    async checkSubscriptionStatus(mpSubscriptionId: string) {
+      try {
+        const preApproval = new PreApproval(mercadopago);
+        const subscription = await preApproval.get({ id: mpSubscriptionId });
+
+        console.log(
+          `🔍 Verificando estado de suscripción: ${mpSubscriptionId}`
+        );
+        console.log(`📊 Estado actual: ${subscription.status}`);
+
+        return {
+          id: subscription.id,
+          status: subscription.status,
+          external_reference: subscription.external_reference,
+          payer_email: subscription.payer_email,
+          auto_recurring: subscription.auto_recurring,
+          reason: subscription.reason,
+        };
+      } catch (error) {
+        console.error(
+          `❌ Error verificando suscripción ${mpSubscriptionId}:`,
+          error
+        );
+        throw error;
+      }
+    },
+
+    // Función para verificar y actualizar estado de pago manualmente
+    async checkAndUpdatePaymentStatus(orderId: string) {
+      try {
+        const order = await prisma.order.findUnique({
+          where: { id: orderId },
+          include: {
+            user: true,
+            orderSubscriptions: {
+              include: {
+                subscription: {
+                  include: { products: true },
+                },
+              },
+            },
+          },
+        });
+
+        if (!order || !order.mpSubscriptionId) {
+          return { success: false, message: "Orden no encontrada" };
+        }
+
+        // Verificar estado en MercadoPago
+        const mpStatus = await this.checkSubscriptionStatus(
+          order.mpSubscriptionId
+        );
+
+        // Parsear información de la transacción
+        const transactionInfo = this.parseTransactionId(
+          order.transactionId || ""
+        );
+
+        if (!transactionInfo) {
+          return { success: false, message: "Error parsing transaction info" };
+        }
+
+        // Si está aprobada y no está marcada como pagada en nuestra BD
+        if (mpStatus.status === "authorized" && !order.isPaid) {
+          // Confirmar el pago
+          const confirmedOrder = await api.order.confirmPayment(orderId);
+
+          return {
+            success: true,
+            status: "approved",
+            redirectUrl: this.generateRedirectUrl(
+              "approved",
+              transactionInfo.subscriptionType,
+              transactionInfo.hasBite
+            ),
+            order: confirmedOrder,
+          };
+        }
+
+        // Si está rechazada o cancelada
+        if (mpStatus.status === "cancelled" || mpStatus.status === "rejected") {
+          return {
+            success: false,
+            status: mpStatus.status,
+            redirectUrl: this.generateRedirectUrl(
+              mpStatus.status,
+              transactionInfo.subscriptionType,
+              transactionInfo.hasBite
+            ),
+          };
+        }
+
+        // Si está pendiente
+        return {
+          success: true,
+          status: "pending",
+          redirectUrl: this.generateRedirectUrl(
+            "pending",
+            transactionInfo.subscriptionType,
+            transactionInfo.hasBite
+          ),
+        };
+      } catch (error) {
+        console.error("❌ Error verificando estado de pago:", error);
+        return { success: false, message: "Error verificando pago" };
+      }
     },
   },
 };
