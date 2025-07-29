@@ -1,7 +1,12 @@
 export const pricingPlans = [
   {
+<<<<<<< HEAD
     title: "Plan Anual",
     price: 85000,
+=======
+    title: "Business",
+    price: "85.000",
+>>>>>>> ca9b783 (first commit)
     subtitle: "Válido por 12 meses",
     features: [
       "Acceso ilimitado a Astrobot",
@@ -13,6 +18,7 @@ export const pricingPlans = [
     isActive: false,
   },
 ];
+<<<<<<< HEAD
 
 export const pricingPlans2 = [
   {
@@ -53,3 +59,5 @@ export const pricingPlans2 = [
     active: false,
   },
 ];
+=======
+>>>>>>> ca9b783 (first commit)

@@ -42,6 +42,16 @@
             align-items: center;
             justify-content: space-between;
             padding: 15px 20px;
+<<<<<<< HEAD
+=======
+            .logo {
+                a {
+                    img {
+                        max-height: 45px;
+                    }
+                }
+            }
+>>>>>>> ca9b783 (first commit)
             .close-menu {
                 .close-button {
                     background: var(--color-darker);

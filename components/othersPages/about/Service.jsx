@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-"use client";
-import React from "react";
-import { IconRenderer } from "../../utlis/iconMapper";
-import { services } from "../../data/service";
-=======
 import { services } from "@/data/service";
 import React from "react";
->>>>>>> ca9b783 (first commit)
 
-export default function Services() {
+export default function Service() {
   return (
     <div className="rainbow-service-area rainbow-section-gap">
       <div className="container">
@@ -17,17 +10,17 @@ export default function Services() {
             <div
               className="section-title text-center"
               data-sal="slide-up"
-              data-sal-duration={700}
-              data-sal-delay={100}
+              data-sal-duration={400}
+              data-sal-delay={150}
             >
               <h4 className="subtitle">
-                <span className="theme-gradient">
-                  Soluciones Tributarias adaptadas a la era digital
-                </span>
+                <span className="theme-gradient">What we can do for you</span>
               </h4>
-              <h2 className="title w-600 mb--20">Servicios</h2>
+              <h2 className="title w-600 mb--20">Services provide for you.</h2>
               <p className="description b1">
-                Ilumina tu camino financiero, descubre nuestros servicios
+                There are many variations of passages of Lorem Ipsum available,{" "}
+                <br />
+                but the majority have suffered alteration.
               </p>
             </div>
           </div>
@@ -41,26 +34,13 @@ export default function Services() {
               data-sal-delay={service.delay}
               data-sal-duration={800}
             >
-              <div className="service service__style--1 bg-color-blackest radius mt--20 rbt-border text-start">
+              <div className="service service__style--1 bg-color-blackest radius mt--25 text-center">
                 <div className="icon">
-<<<<<<< HEAD
-                  <IconRenderer
-                    iconName={service.icon}
-                    size={45}
-                    color="var(--color-primary)"
-                    className="service-icon"
-                  />
-                </div>
-                <div className="content">
-                  <h4 className="title w-600">
-                    <a href={service.url}>{service.title}</a>
-=======
                   <i className={service.icon} />
                 </div>
                 <div className="content">
                   <h4 className="title w-600">
                     <a href="#">{service.title}</a>
->>>>>>> ca9b783 (first commit)
                   </h4>
                   <p className="description b1 color-gray mb--0">
                     {service.description}{" "}

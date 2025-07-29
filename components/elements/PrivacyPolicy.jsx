@@ -7,7 +7,11 @@ export default function PrivacyPolicy() {
         <div className="row">
           <div className="col-lg-12">
             <div className="entry-content">
+<<<<<<< HEAD
               <h2>Política de Privacidad</h2>
+=======
+              <h2>Welcome to Doob Privacy Policy</h2>
+>>>>>>> ca9b783 (first commit)
               <ol>
                 <li>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -41,7 +45,13 @@ export default function PrivacyPolicy() {
                 <li>
                   We collect certain personal information about visitors and
                   users of our Sites.&nbsp;
+<<<<<<< HEAD
                   <a href="http://google.com">http://google.com</a>
+=======
+                  <a href="http://rainbowit.net/themes/trydo">
+                    http://rainbowit.net/themes/
+                  </a>
+>>>>>>> ca9b783 (first commit)
                   imroz
                 </li>
                 <li>

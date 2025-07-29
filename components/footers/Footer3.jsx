@@ -1,7 +1,11 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+<<<<<<< HEAD
 import { footerSections, socialLinks } from "../../data/footerLinks";
+=======
+import { footerSections, socialLinks } from "@/data/footerLinks";
+>>>>>>> ca9b783 (first commit)
 export default function Footer3() {
   return (
     <>
@@ -49,7 +53,11 @@ export default function Footer3() {
                 data-sal-delay={150}
               >
                 <div className="call-to-btn text-left mt_sm--20 text-lg-right">
+<<<<<<< HEAD
                   <a className="btn-default" href="/contact">
+=======
+                  <a className="btn-default" href="#">
+>>>>>>> ca9b783 (first commit)
                     Ayuda <i className="feather-arrow-right" />
                   </a>
                 </div>
@@ -109,12 +117,19 @@ export default function Footer3() {
               <div className="copyright-left">
                 <ul className="ft-menu link-hover">
                   <li>
+<<<<<<< HEAD
                     <Link href={"/politica-privacidad"}>
                       Política de Privacidad
                     </Link>
                   </li>
                   <li>
                     <a href="/terminos-y-condiciones">Terminos y Condiciones</a>
+=======
+                    <Link href={`#`}>Política de Privacidad</Link>
+                  </li>
+                  <li>
+                    <a href="#">Terminos y Condiciones</a>
+>>>>>>> ca9b783 (first commit)
                   </li>
                   <li>
                     <Link href={`/contact`}>Contáctanos</Link>

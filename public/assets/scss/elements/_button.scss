@@ -46,7 +46,11 @@ div {
         }
 
         &:hover {
+<<<<<<< HEAD
             box-shadow: white;
+=======
+            box-shadow: var(--shadow-primary);
+>>>>>>> ca9b783 (first commit)
             -webkit-filter: brightness(125%);
             filter: brightness(125%);
             color: var(--color-white);
@@ -89,6 +93,7 @@ div {
 
         &.btn-border {
             background-image: inherit;
+<<<<<<< HEAD
             border-color: #000;
             border-width: 2px;
             border-style: solid;
@@ -112,6 +117,15 @@ div {
                 background-color: white;
                 border-color: white;
                 color: #000;
+=======
+            border-color: var(--color-border);
+            border-width: 2px;
+            border-style: solid;
+
+            &:hover {
+                background-color: #53278c;
+                border-color: var(--color-secondary);
+>>>>>>> ca9b783 (first commit)
             }
         }
 
@@ -125,8 +139,13 @@ div {
             }
             &:hover {
                 box-shadow: none;
+<<<<<<< HEAD
                 background-color: white;
                 border-color: white;
+=======
+                background-color: var(--color-secondary);
+                border-color: var(--color-secondary);
+>>>>>>> ca9b783 (first commit)
             }
         }
         &.round {

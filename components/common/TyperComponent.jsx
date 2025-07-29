@@ -31,6 +31,10 @@ export default function TyperComponent({
       }, 600);
     }, 3000);
 
+<<<<<<< HEAD
+=======
+    // Cleanup function to destroy the Typed instance
+>>>>>>> ca9b783 (first commit)
     return () => {
       clearInterval(reapetTyping);
     };

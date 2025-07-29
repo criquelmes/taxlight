@@ -3,6 +3,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+<<<<<<< HEAD
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -30,6 +31,8 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["node-cron"],
   },
+=======
+>>>>>>> ca9b783 (first commit)
 };
 
 export default nextConfig;

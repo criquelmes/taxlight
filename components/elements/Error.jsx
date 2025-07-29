@@ -15,6 +15,18 @@ export default function Error() {
                 Parece que la página que estás buscando no existe o ha sido
                 movida.
               </p>
+<<<<<<< HEAD
+=======
+              {/* <form
+                onSubmit={(e) => e.preventDefault()}
+                className="blog-search"
+              >
+                <input type="text" placeholder="Search Here..." />
+                <button className="search-button">
+                  <i className="feather-search" />
+                </button>
+              </form> */}
+>>>>>>> ca9b783 (first commit)
               <div className="view-more-button">
                 <Link className="btn-default" href={`/`}>
                   Volver a la página principal

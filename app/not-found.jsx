@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import Error from "../components/elements/Error";
 
 import Footer3 from "../components/footers/Footer3";
 import Header2 from "../components/headers/Header2";
+=======
+import Error from "@/components/elements/Error";
+import Footer3 from "@/components/footers/Footer3";
+import Header2 from "@/components/headers/Header2";
+>>>>>>> ca9b783 (first commit)
 import React from "react";
 
 export const metadata = {

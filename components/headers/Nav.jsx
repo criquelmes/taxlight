@@ -1,9 +1,16 @@
 "use client";
+<<<<<<< HEAD
 
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menuItems } from "../../data/menu";
+=======
+import { menuItems } from "@/data/menu";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
+>>>>>>> ca9b783 (first commit)
 
 export default function Nav() {
   const pathname = usePathname();

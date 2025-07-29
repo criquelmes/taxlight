@@ -1,5 +1,9 @@
 import React from "react";
 import Image from "next/image";
+<<<<<<< HEAD
+=======
+import TyperComponent from "@/components/common/TyperComponent";
+>>>>>>> ca9b783 (first commit)
 import Link from "next/link";
 export default function About() {
   return (
@@ -15,7 +19,11 @@ export default function About() {
               <Image
                 className="w-100"
                 alt="About Images"
+<<<<<<< HEAD
                 src="/assets/images/IMG_9874.jpg"
+=======
+                src="/assets/images/about/about-1.png"
+>>>>>>> ca9b783 (first commit)
                 width={543}
                 height={642}
               />
@@ -38,7 +46,11 @@ export default function About() {
                 </h2>
                 <p>
                   Con nuestra{" "}
+<<<<<<< HEAD
                   <span className="font-bold">
+=======
+                  <span className="font-bold text-white">
+>>>>>>> ca9b783 (first commit)
                     experiencia en el mundo de los criptoactivos y más de 15
                     años en el ámbito tributario
                   </span>

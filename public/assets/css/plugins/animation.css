@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+=======
+
+/*!
+Animate.css - http://daneden.me/animate
+Version - 3.4.0
+Licensed under the MIT license - http://opensource.org/licenses/MIT
+
+Copyright (c) 2015 Daniel Eden
+*/
+
+>>>>>>> ca9b783 (first commit)
 .animated {
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
@@ -17,12 +29,18 @@
 
 .animated.bounceIn,
 .animated.bounceOut {
+<<<<<<< HEAD
   -webkit-animation-duration: 0.75s;
   animation-duration: 0.75s;
+=======
+  -webkit-animation-duration: .75s;
+  animation-duration: .75s;
+>>>>>>> ca9b783 (first commit)
 }
 
 .animated.flipOutX,
 .animated.flipOutY {
+<<<<<<< HEAD
   -webkit-animation-duration: 0.75s;
   animation-duration: 0.75s;
 }
@@ -43,24 +61,52 @@
   43% {
     -webkit-animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+=======
+  -webkit-animation-duration: .75s;
+  animation-duration: .75s;
+}
+
+@-webkit-keyframes bounce {
+  from, 20%, 53%, 80%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  }
+
+  40%, 43% {
+    -webkit-animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(0, -30px, 0);
     transform: translate3d(0, -30px, 0);
   }
 
   70% {
+<<<<<<< HEAD
     -webkit-animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+=======
+    -webkit-animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(0, -15px, 0);
     transform: translate3d(0, -15px, 0);
   }
 
   90% {
+<<<<<<< HEAD
     -webkit-transform: translate3d(0, -4px, 0);
     transform: translate3d(0, -4px, 0);
+=======
+    -webkit-transform: translate3d(0,-4px,0);
+    transform: translate3d(0,-4px,0);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes bounce {
+<<<<<<< HEAD
   from,
   20%,
   53%,
@@ -76,20 +122,42 @@
   43% {
     -webkit-animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+=======
+  from, 20%, 53%, 80%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  }
+
+  40%, 43% {
+    -webkit-animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(0, -30px, 0);
     transform: translate3d(0, -30px, 0);
   }
 
   70% {
+<<<<<<< HEAD
     -webkit-animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+=======
+    -webkit-animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(0, -15px, 0);
     transform: translate3d(0, -15px, 0);
   }
 
   90% {
+<<<<<<< HEAD
     -webkit-transform: translate3d(0, -4px, 0);
     transform: translate3d(0, -4px, 0);
+=======
+    -webkit-transform: translate3d(0,-4px,0);
+    transform: translate3d(0,-4px,0);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -98,6 +166,7 @@
   animation-name: bounce;
   -webkit-transform-origin: center bottom;
   -ms-transform-origin: center bottom;
+<<<<<<< HEAD
   transform-origin: center bottom;
 }
 
@@ -110,11 +179,23 @@
 
   25%,
   75% {
+=======
+      transform-origin: center bottom;
+}
+
+@-webkit-keyframes flash {
+  from, 50%, to {
+    opacity: 1;
+  }
+
+  25%, 75% {
+>>>>>>> ca9b783 (first commit)
     opacity: 0;
   }
 }
 
 @keyframes flash {
+<<<<<<< HEAD
   from,
   50%,
   to {
@@ -123,6 +204,13 @@
 
   25%,
   75% {
+=======
+  from, 50%, to {
+    opacity: 1;
+  }
+
+  25%, 75% {
+>>>>>>> ca9b783 (first commit)
     opacity: 0;
   }
 }
@@ -132,6 +220,11 @@
   animation-name: flash;
 }
 
+<<<<<<< HEAD
+=======
+/* originally authored by Nick Pettit - https://github.com/nickpettit/glide */
+
+>>>>>>> ca9b783 (first commit)
 @-webkit-keyframes pulse {
   from {
     -webkit-transform: scale3d(1, 1, 1);
@@ -193,6 +286,7 @@
   }
 
   65% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.95, 1.05, 1);
     transform: scale3d(0.95, 1.05, 1);
   }
@@ -200,6 +294,15 @@
   75% {
     -webkit-transform: scale3d(1.05, 0.95, 1);
     transform: scale3d(1.05, 0.95, 1);
+=======
+    -webkit-transform: scale3d(.95, 1.05, 1);
+    transform: scale3d(.95, 1.05, 1);
+  }
+
+  75% {
+    -webkit-transform: scale3d(1.05, .95, 1);
+    transform: scale3d(1.05, .95, 1);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
@@ -230,6 +333,7 @@
   }
 
   65% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.95, 1.05, 1);
     transform: scale3d(0.95, 1.05, 1);
   }
@@ -237,6 +341,15 @@
   75% {
     -webkit-transform: scale3d(1.05, 0.95, 1);
     transform: scale3d(1.05, 0.95, 1);
+=======
+    -webkit-transform: scale3d(.95, 1.05, 1);
+    transform: scale3d(.95, 1.05, 1);
+  }
+
+  75% {
+    -webkit-transform: scale3d(1.05, .95, 1);
+    transform: scale3d(1.05, .95, 1);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
@@ -251,50 +364,74 @@
 }
 
 @-webkit-keyframes shake {
+<<<<<<< HEAD
   from,
   to {
+=======
+  from, to {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
 
+<<<<<<< HEAD
   10%,
   30%,
   50%,
   70%,
   90% {
+=======
+  10%, 30%, 50%, 70%, 90% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(-10px, 0, 0);
     transform: translate3d(-10px, 0, 0);
   }
 
+<<<<<<< HEAD
   20%,
   40%,
   60%,
   80% {
+=======
+  20%, 40%, 60%, 80% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(10px, 0, 0);
     transform: translate3d(10px, 0, 0);
   }
 }
 
 @keyframes shake {
+<<<<<<< HEAD
   from,
   to {
+=======
+  from, to {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
 
+<<<<<<< HEAD
   10%,
   30%,
   50%,
   70%,
   90% {
+=======
+  10%, 30%, 50%, 70%, 90% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(-10px, 0, 0);
     transform: translate3d(-10px, 0, 0);
   }
 
+<<<<<<< HEAD
   20%,
   40%,
   60%,
   80% {
+=======
+  20%, 40%, 60%, 80% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: translate3d(10px, 0, 0);
     transform: translate3d(10px, 0, 0);
   }
@@ -362,7 +499,11 @@
 .swing {
   -webkit-transform-origin: top center;
   -ms-transform-origin: top center;
+<<<<<<< HEAD
   transform-origin: top center;
+=======
+      transform-origin: top center;
+>>>>>>> ca9b783 (first commit)
   -webkit-animation-name: swing;
   animation-name: swing;
 }
@@ -373,6 +514,7 @@
     transform: scale3d(1, 1, 1);
   }
 
+<<<<<<< HEAD
   10%,
   20% {
     -webkit-transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
@@ -383,13 +525,25 @@
   50%,
   70%,
   90% {
+=======
+  10%, 20% {
+    -webkit-transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+    transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+  }
+
+  30%, 50%, 70%, 90% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
     transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
   }
 
+<<<<<<< HEAD
   40%,
   60%,
   80% {
+=======
+  40%, 60%, 80% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
     transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
   }
@@ -406,6 +560,7 @@
     transform: scale3d(1, 1, 1);
   }
 
+<<<<<<< HEAD
   10%,
   20% {
     -webkit-transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
@@ -416,13 +571,25 @@
   50%,
   70%,
   90% {
+=======
+  10%, 20% {
+    -webkit-transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+    transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+  }
+
+  30%, 50%, 70%, 90% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
     transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
   }
 
+<<<<<<< HEAD
   40%,
   60%,
   80% {
+=======
+  40%, 60%, 80% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
     transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
   }
@@ -438,6 +605,11 @@
   animation-name: tada;
 }
 
+<<<<<<< HEAD
+=======
+/* originally authored by Nick Pettit - https://github.com/nickpettit/glide */
+
+>>>>>>> ca9b783 (first commit)
 @-webkit-keyframes wobble {
   from {
     -webkit-transform: none;
@@ -518,9 +690,13 @@
 }
 
 @-webkit-keyframes jello {
+<<<<<<< HEAD
   from,
   11.1%,
   to {
+=======
+  from, 11.1%, to {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: none;
     transform: none;
   }
@@ -562,9 +738,13 @@
 }
 
 @keyframes jello {
+<<<<<<< HEAD
   from,
   11.1%,
   to {
+=======
+  from, 11.1%, to {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: none;
     transform: none;
   }
@@ -610,6 +790,7 @@
   animation-name: jello;
   -webkit-transform-origin: center;
   -ms-transform-origin: center;
+<<<<<<< HEAD
   transform-origin: center;
 }
 
@@ -622,12 +803,26 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+      transform-origin: center;
+}
+
+@-webkit-keyframes bounceIn {
+  from, 20%, 40%, 60%, 80%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   0% {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 
   20% {
@@ -636,8 +831,13 @@
   }
 
   40% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.9, 0.9, 0.9);
     transform: scale3d(0.9, 0.9, 0.9);
+=======
+    -webkit-transform: scale3d(.9, .9, .9);
+    transform: scale3d(.9, .9, .9);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
@@ -647,8 +847,13 @@
   }
 
   80% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.97, 0.97, 0.97);
     transform: scale3d(0.97, 0.97, 0.97);
+=======
+    -webkit-transform: scale3d(.97, .97, .97);
+    transform: scale3d(.97, .97, .97);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
@@ -659,6 +864,7 @@
 }
 
 @keyframes bounceIn {
+<<<<<<< HEAD
   from,
   20%,
   40%,
@@ -667,12 +873,22 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 20%, 40%, 60%, 80%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   0% {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 
   20% {
@@ -681,8 +897,13 @@
   }
 
   40% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.9, 0.9, 0.9);
     transform: scale3d(0.9, 0.9, 0.9);
+=======
+    -webkit-transform: scale3d(.9, .9, .9);
+    transform: scale3d(.9, .9, .9);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
@@ -692,8 +913,13 @@
   }
 
   80% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.97, 0.97, 0.97);
     transform: scale3d(0.97, 0.97, 0.97);
+=======
+    -webkit-transform: scale3d(.97, .97, .97);
+    transform: scale3d(.97, .97, .97);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
@@ -709,6 +935,7 @@
 }
 
 @-webkit-keyframes bounceInDown {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -716,6 +943,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   0% {
@@ -747,6 +979,7 @@
 }
 
 @keyframes bounceInDown {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -754,6 +987,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   0% {
@@ -790,6 +1028,7 @@
 }
 
 @-webkit-keyframes bounceInLeft {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -797,6 +1036,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   0% {
@@ -828,6 +1072,7 @@
 }
 
 @keyframes bounceInLeft {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -835,6 +1080,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   0% {
@@ -871,6 +1121,7 @@
 }
 
 @-webkit-keyframes bounceInRight {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -878,6 +1129,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   from {
@@ -909,6 +1165,7 @@
 }
 
 @keyframes bounceInRight {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -916,6 +1173,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   from {
@@ -952,6 +1214,7 @@
 }
 
 @-webkit-keyframes bounceInUp {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -959,6 +1222,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   from {
@@ -990,6 +1258,7 @@
 }
 
 @keyframes bounceInUp {
+<<<<<<< HEAD
   from,
   60%,
   75%,
@@ -997,6 +1266,11 @@
   to {
     -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+=======
+  from, 60%, 75%, 90%, to {
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+>>>>>>> ca9b783 (first commit)
   }
 
   from {
@@ -1034,12 +1308,20 @@
 
 @-webkit-keyframes bounceOut {
   20% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.9, 0.9, 0.9);
     transform: scale3d(0.9, 0.9, 0.9);
   }
 
   50%,
   55% {
+=======
+    -webkit-transform: scale3d(.9, .9, .9);
+    transform: scale3d(.9, .9, .9);
+  }
+
+  50%, 55% {
+>>>>>>> ca9b783 (first commit)
     opacity: 1;
     -webkit-transform: scale3d(1.1, 1.1, 1.1);
     transform: scale3d(1.1, 1.1, 1.1);
@@ -1047,19 +1329,32 @@
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes bounceOut {
   20% {
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.9, 0.9, 0.9);
     transform: scale3d(0.9, 0.9, 0.9);
   }
 
   50%,
   55% {
+=======
+    -webkit-transform: scale3d(.9, .9, .9);
+    transform: scale3d(.9, .9, .9);
+  }
+
+  50%, 55% {
+>>>>>>> ca9b783 (first commit)
     opacity: 1;
     -webkit-transform: scale3d(1.1, 1.1, 1.1);
     transform: scale3d(1.1, 1.1, 1.1);
@@ -1067,8 +1362,13 @@
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -1083,8 +1383,12 @@
     transform: translate3d(0, 10px, 0);
   }
 
+<<<<<<< HEAD
   40%,
   45% {
+=======
+  40%, 45% {
+>>>>>>> ca9b783 (first commit)
     opacity: 1;
     -webkit-transform: translate3d(0, -20px, 0);
     transform: translate3d(0, -20px, 0);
@@ -1103,8 +1407,12 @@
     transform: translate3d(0, 10px, 0);
   }
 
+<<<<<<< HEAD
   40%,
   45% {
+=======
+  40%, 45% {
+>>>>>>> ca9b783 (first commit)
     opacity: 1;
     -webkit-transform: translate3d(0, -20px, 0);
     transform: translate3d(0, -20px, 0);
@@ -1194,8 +1502,12 @@
     transform: translate3d(0, -10px, 0);
   }
 
+<<<<<<< HEAD
   40%,
   45% {
+=======
+  40%, 45% {
+>>>>>>> ca9b783 (first commit)
     opacity: 1;
     -webkit-transform: translate3d(0, 20px, 0);
     transform: translate3d(0, 20px, 0);
@@ -1214,8 +1526,12 @@
     transform: translate3d(0, -10px, 0);
   }
 
+<<<<<<< HEAD
   40%,
   45% {
+=======
+  40%, 45% {
+>>>>>>> ca9b783 (first commit)
     opacity: 1;
     -webkit-transform: translate3d(0, 20px, 0);
     transform: translate3d(0, 20px, 0);
@@ -1788,26 +2104,41 @@
   }
 
   40% {
+<<<<<<< HEAD
     -webkit-transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -190deg);
     transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -190deg);
+=======
+    -webkit-transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -190deg);
+    transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -190deg);
+>>>>>>> ca9b783 (first commit)
     -webkit-animation-timing-function: ease-out;
     animation-timing-function: ease-out;
   }
 
   50% {
+<<<<<<< HEAD
     -webkit-transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -170deg);
     transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -170deg);
+=======
+    -webkit-transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -170deg);
+    transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -170deg);
+>>>>>>> ca9b783 (first commit)
     -webkit-animation-timing-function: ease-in;
     animation-timing-function: ease-in;
   }
 
   80% {
+<<<<<<< HEAD
     -webkit-transform: perspective(400px) scale3d(0.95, 0.95, 0.95);
     transform: perspective(400px) scale3d(0.95, 0.95, 0.95);
+=======
+    -webkit-transform: perspective(400px) scale3d(.95, .95, .95);
+    transform: perspective(400px) scale3d(.95, .95, .95);
+>>>>>>> ca9b783 (first commit)
     -webkit-animation-timing-function: ease-in;
     animation-timing-function: ease-in;
   }
@@ -1829,26 +2160,41 @@
   }
 
   40% {
+<<<<<<< HEAD
     -webkit-transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -190deg);
     transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -190deg);
+=======
+    -webkit-transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -190deg);
+    transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -190deg);
+>>>>>>> ca9b783 (first commit)
     -webkit-animation-timing-function: ease-out;
     animation-timing-function: ease-out;
   }
 
   50% {
+<<<<<<< HEAD
     -webkit-transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -170deg);
     transform: perspective(400px) translate3d(0, 0, 150px)
       rotate3d(0, 1, 0, -170deg);
+=======
+    -webkit-transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -170deg);
+    transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -170deg);
+>>>>>>> ca9b783 (first commit)
     -webkit-animation-timing-function: ease-in;
     animation-timing-function: ease-in;
   }
 
   80% {
+<<<<<<< HEAD
     -webkit-transform: perspective(400px) scale3d(0.95, 0.95, 0.95);
     transform: perspective(400px) scale3d(0.95, 0.95, 0.95);
+=======
+    -webkit-transform: perspective(400px) scale3d(.95, .95, .95);
+    transform: perspective(400px) scale3d(.95, .95, .95);
+>>>>>>> ca9b783 (first commit)
     -webkit-animation-timing-function: ease-in;
     animation-timing-function: ease-in;
   }
@@ -2592,8 +2938,12 @@
     animation-timing-function: ease-in-out;
   }
 
+<<<<<<< HEAD
   20%,
   60% {
+=======
+  20%, 60% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: rotate3d(0, 0, 1, 80deg);
     transform: rotate3d(0, 0, 1, 80deg);
     -webkit-transform-origin: top left;
@@ -2602,8 +2952,12 @@
     animation-timing-function: ease-in-out;
   }
 
+<<<<<<< HEAD
   40%,
   80% {
+=======
+  40%, 80% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: rotate3d(0, 0, 1, 60deg);
     transform: rotate3d(0, 0, 1, 60deg);
     -webkit-transform-origin: top left;
@@ -2628,8 +2982,12 @@
     animation-timing-function: ease-in-out;
   }
 
+<<<<<<< HEAD
   20%,
   60% {
+=======
+  20%, 60% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: rotate3d(0, 0, 1, 80deg);
     transform: rotate3d(0, 0, 1, 80deg);
     -webkit-transform-origin: top left;
@@ -2638,8 +2996,12 @@
     animation-timing-function: ease-in-out;
   }
 
+<<<<<<< HEAD
   40%,
   80% {
+=======
+  40%, 80% {
+>>>>>>> ca9b783 (first commit)
     -webkit-transform: rotate3d(0, 0, 1, 60deg);
     transform: rotate3d(0, 0, 1, 60deg);
     -webkit-transform-origin: top left;
@@ -2661,6 +3023,11 @@
   animation-name: hinge;
 }
 
+<<<<<<< HEAD
+=======
+/* originally authored by Nick Pettit - https://github.com/nickpettit/glide */
+
+>>>>>>> ca9b783 (first commit)
 @-webkit-keyframes rollIn {
   from {
     opacity: 0;
@@ -2694,6 +3061,11 @@
   animation-name: rollIn;
 }
 
+<<<<<<< HEAD
+=======
+/* originally authored by Nick Pettit - https://github.com/nickpettit/glide */
+
+>>>>>>> ca9b783 (first commit)
 @-webkit-keyframes rollOut {
   from {
     opacity: 1;
@@ -2726,8 +3098,13 @@
 @-webkit-keyframes zoomIn {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 
   50% {
@@ -2738,8 +3115,13 @@
 @keyframes zoomIn {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 
   50% {
@@ -2755,36 +3137,64 @@
 @-webkit-keyframes zoomInDown {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -1000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -1000px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes zoomInDown {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -1000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -1000px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, -1000px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -2796,36 +3206,64 @@
 @-webkit-keyframes zoomInLeft {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(-1000px, 0, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(-1000px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(-1000px, 0, 0);
+    transform: scale3d(.1, .1, .1) translate3d(-1000px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(10px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(10px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(10px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(10px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes zoomInLeft {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(-1000px, 0, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(-1000px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(-1000px, 0, 0);
+    transform: scale3d(.1, .1, .1) translate3d(-1000px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(10px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(10px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(10px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(10px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -2837,36 +3275,64 @@
 @-webkit-keyframes zoomInRight {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(1000px, 0, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(1000px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(1000px, 0, 0);
+    transform: scale3d(.1, .1, .1) translate3d(1000px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(-10px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(-10px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(-10px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(-10px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes zoomInRight {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(1000px, 0, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(1000px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(1000px, 0, 0);
+    transform: scale3d(.1, .1, .1) translate3d(1000px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(-10px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(-10px, 0, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(-10px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(-10px, 0, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -2878,36 +3344,64 @@
 @-webkit-keyframes zoomInUp {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 1000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 1000px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, 1000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, 1000px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes zoomInUp {
   from {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 1000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 1000px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, 1000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, 1000px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   60% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -2923,8 +3417,13 @@
 
   50% {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
@@ -2939,8 +3438,13 @@
 
   50% {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.3, 0.3, 0.3);
     transform: scale3d(0.3, 0.3, 0.3);
+=======
+    -webkit-transform: scale3d(.3, .3, .3);
+    transform: scale3d(.3, .3, .3);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
@@ -2956,40 +3460,72 @@
 @-webkit-keyframes zoomOutDown {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 2000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 2000px, 0);
     -webkit-transform-origin: center bottom;
     transform-origin: center bottom;
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, 2000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, 2000px, 0);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes zoomOutDown {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, -60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, -60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 2000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, 2000px, 0);
     -webkit-transform-origin: center bottom;
     transform-origin: center bottom;
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, 2000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, 2000px, 0);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -3001,14 +3537,24 @@
 @-webkit-keyframes zoomOutLeft {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(42px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(42px, 0, 0);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(42px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(42px, 0, 0);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale(0.1) translate3d(-2000px, 0, 0);
     transform: scale(0.1) translate3d(-2000px, 0, 0);
+=======
+    -webkit-transform: scale(.1) translate3d(-2000px, 0, 0);
+    transform: scale(.1) translate3d(-2000px, 0, 0);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform-origin: left center;
     transform-origin: left center;
   }
@@ -3017,14 +3563,24 @@
 @keyframes zoomOutLeft {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(42px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(42px, 0, 0);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(42px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(42px, 0, 0);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale(0.1) translate3d(-2000px, 0, 0);
     transform: scale(0.1) translate3d(-2000px, 0, 0);
+=======
+    -webkit-transform: scale(.1) translate3d(-2000px, 0, 0);
+    transform: scale(.1) translate3d(-2000px, 0, 0);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform-origin: left center;
     transform-origin: left center;
   }
@@ -3038,14 +3594,24 @@
 @-webkit-keyframes zoomOutRight {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(-42px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(-42px, 0, 0);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(-42px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(-42px, 0, 0);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale(0.1) translate3d(2000px, 0, 0);
     transform: scale(0.1) translate3d(2000px, 0, 0);
+=======
+    -webkit-transform: scale(.1) translate3d(2000px, 0, 0);
+    transform: scale(.1) translate3d(2000px, 0, 0);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform-origin: right center;
     transform-origin: right center;
   }
@@ -3054,14 +3620,24 @@
 @keyframes zoomOutRight {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(-42px, 0, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(-42px, 0, 0);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(-42px, 0, 0);
+    transform: scale3d(.475, .475, .475) translate3d(-42px, 0, 0);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale(0.1) translate3d(2000px, 0, 0);
     transform: scale(0.1) translate3d(2000px, 0, 0);
+=======
+    -webkit-transform: scale(.1) translate3d(2000px, 0, 0);
+    transform: scale(.1) translate3d(2000px, 0, 0);
+>>>>>>> ca9b783 (first commit)
     -webkit-transform-origin: right center;
     transform-origin: right center;
   }
@@ -3075,40 +3651,72 @@
 @-webkit-keyframes zoomOutUp {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -2000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -2000px, 0);
     -webkit-transform-origin: center bottom;
     transform-origin: center bottom;
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, -2000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, -2000px, 0);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
 @keyframes zoomOutUp {
   40% {
     opacity: 1;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     transform: scale3d(0.475, 0.475, 0.475) translate3d(0, 60px, 0);
     -webkit-animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+=======
+    -webkit-transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    transform: scale3d(.475, .475, .475) translate3d(0, 60px, 0);
+    -webkit-animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+    animation-timing-function: cubic-bezier(0.550, 0.055, 0.675, 0.190);
+>>>>>>> ca9b783 (first commit)
   }
 
   to {
     opacity: 0;
+<<<<<<< HEAD
     -webkit-transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -2000px, 0);
     transform: scale3d(0.1, 0.1, 0.1) translate3d(0, -2000px, 0);
     -webkit-transform-origin: center bottom;
     transform-origin: center bottom;
     -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+=======
+    -webkit-transform: scale3d(.1, .1, .1) translate3d(0, -2000px, 0);
+    transform: scale3d(.1, .1, .1) translate3d(0, -2000px, 0);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+    -webkit-animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.320, 1);
+>>>>>>> ca9b783 (first commit)
   }
 }
 
@@ -3365,9 +3973,24 @@
   animation-name: slideOutUp;
 }
 
+<<<<<<< HEAD
 .animated {
   opacity: 0;
   -ms-transform: translateY(200%);
   transform: translateY(200%);
   -webkit-transform: translateY(200%);
 }
+=======
+
+
+
+.animated{
+  opacity: 0;
+  -ms-transform: translateY(200%);
+      transform: translateY(200%);
+  -webkit-transform: translateY(200%);
+}
+
+
+
+>>>>>>> ca9b783 (first commit)

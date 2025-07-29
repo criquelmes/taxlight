@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+<<<<<<< HEAD
     "postinstall": "prisma generate",
     "lint": "next lint",
     "seed": "ts-node seed/seed-subscriptions.ts"
@@ -13,10 +14,17 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@prisma/client": "^6.10.1",
+=======
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+>>>>>>> ca9b783 (first commit)
     "bootstrap": "^5.0.2",
     "disqus-react": "^1.1.5",
     "imagesloaded": "^5.0.0",
     "isotope-layout": "^3.0.6",
+<<<<<<< HEAD
     "lucide-react": "^0.515.0",
     "mercadopago": "^2.3.0",
     "next": "14.2.15",
@@ -41,5 +49,18 @@
     "@types/node-cron": "^3.0.11",
     "@types/react": "19.1.6",
     "typescript": "5.8.3"
+=======
+    "next": "14.2.15",
+    "photoswipe": "^5.4.4",
+    "prop-types": "^15.8.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-modal-video": "^2.0.2",
+    "react-photoswipe-gallery": "^3.0.2",
+    "react-slick": "^0.30.2",
+    "sal.js": "^0.8.5",
+    "sass": "^1.79.5",
+    "slick-carousel": "^1.8.1"
+>>>>>>> ca9b783 (first commit)
   }
 }

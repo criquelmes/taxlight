@@ -1,6 +1,11 @@
 "use client";
+<<<<<<< HEAD
 import { menuItems } from "../../data/menu";
 import { closeMenu } from "../../utlis/toggleMenu";
+=======
+import { menuItems } from "@/data/menu";
+import { closeMenu } from "@/utlis/toggleMenu";
+>>>>>>> ca9b783 (first commit)
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,10 +13,17 @@ import React, { useEffect, useRef } from "react";
 
 export default function MobileMenu() {
   const pathname = usePathname();
+<<<<<<< HEAD
   const popupRef = useRef(null);
   const innerRef = useRef(null);
 
   const menuRefs = useRef([]);
+=======
+  const popupRef = useRef(null); // For .popup-mobile-menu
+  const innerRef = useRef(null); // For .inner
+
+  const menuRefs = useRef([]); // To store references to all menu items
+>>>>>>> ca9b783 (first commit)
   const handleMenuClick = (index) => {
     menuRefs.current.forEach((menu, idx) => {
       if (menu) {
@@ -32,7 +44,13 @@ export default function MobileMenu() {
             }
           }
         } else {
+<<<<<<< HEAD
           menu.classList.remove("open");
+=======
+          // Remove 'active' class from all other menus
+          menu.classList.remove("open");
+          // Remove 'open' class from the next sibling elements
+>>>>>>> ca9b783 (first commit)
           const nextElement = menu.nextElementSibling;
           if (nextElement) {
             nextElement.style.height = "0px";
@@ -42,6 +60,10 @@ export default function MobileMenu() {
     });
   };
 
+<<<<<<< HEAD
+=======
+  // Handler for clicking outside of .inner
+>>>>>>> ca9b783 (first commit)
   const handleOutsideClick = (e) => {
     if (
       popupRef.current &&
@@ -50,13 +72,25 @@ export default function MobileMenu() {
       !innerRef.current.contains(e.target)
     ) {
       closeMenu();
+<<<<<<< HEAD
+=======
+      // Add your logic to handle outside click here
+>>>>>>> ca9b783 (first commit)
     }
   };
 
   useEffect(() => {
+<<<<<<< HEAD
     document.addEventListener("click", handleOutsideClick);
 
     return () => {
+=======
+    // Attach the event listener for outside clicks
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      // Cleanup the event listener when the component unmounts
+>>>>>>> ca9b783 (first commit)
       document.removeEventListener("click", handleOutsideClick);
     };
   }, []);
@@ -97,7 +131,11 @@ export default function MobileMenu() {
               <Image
                 className="logo-dark"
                 alt="Corporate Logo"
+<<<<<<< HEAD
                 src="/assets/images/logo/taxlight-dark.png"
+=======
+                src="/assets/images/logo/logo-dark.png"
+>>>>>>> ca9b783 (first commit)
                 width={288}
                 height={100}
               />
@@ -136,7 +174,11 @@ export default function MobileMenu() {
                 </Link>
               ) : (
                 <a
+<<<<<<< HEAD
                   ref={(el) => (menuRefs.current[index] = el)}
+=======
+                  ref={(el) => (menuRefs.current[index] = el)} // Store refs for each menu item
+>>>>>>> ca9b783 (first commit)
                   onClick={() => handleMenuClick(index)}
                 >
                   <span className={isActiveParent(item) ? "activeParent" : ""}>

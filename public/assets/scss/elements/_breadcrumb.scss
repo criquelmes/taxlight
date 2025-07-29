@@ -29,7 +29,11 @@
                 font-size: 16px;
                 margin: 0;
 
+<<<<<<< HEAD
                 &:not(:last-child)::after {
+=======
+                &::after {
+>>>>>>> ca9b783 (first commit)
                     position: absolute;
                     content: "";
                     top: 50%;

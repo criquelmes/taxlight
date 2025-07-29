@@ -4,6 +4,10 @@ const addScrollspy = (
   activeClass = "current"
 ) => {
   var section = document.querySelectorAll(".scrollSpySection");
+<<<<<<< HEAD
+=======
+  // console.log(section);
+>>>>>>> ca9b783 (first commit)
 
   var sections = {};
   var i = 0;

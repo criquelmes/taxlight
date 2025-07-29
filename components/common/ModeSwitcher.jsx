@@ -1,6 +1,10 @@
 "use client";
 
 import Image from "next/image";
+<<<<<<< HEAD
+=======
+import { useEffect } from "react";
+>>>>>>> ca9b783 (first commit)
 
 export default function ModeSwitcher() {
   const handleClick = () => {

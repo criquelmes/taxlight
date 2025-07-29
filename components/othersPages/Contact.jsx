@@ -45,6 +45,10 @@ export default function Contact() {
       });
   };
 
+<<<<<<< HEAD
+=======
+  // Usar useEffect para el timer
+>>>>>>> ca9b783 (first commit)
   React.useEffect(() => {
     let timer;
     if (result.show) {

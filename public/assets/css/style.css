@@ -1356,7 +1356,11 @@ iframe {
 }
 
 .bg_image--1 {
+<<<<<<< HEAD
   background-image: url(/assets/images/bg/hero-about.jpg);
+=======
+  background-image: url(/assets/images/bg/bg-image-1.jpg);
+>>>>>>> ca9b783 (first commit)
 }
 
 .bg_image--2 {
@@ -1400,7 +1404,11 @@ iframe {
 }
 
 .bg_image--12 {
+<<<<<<< HEAD
   background-image: url(/assets/images/bg/astrobot-left.png);
+=======
+  background-image: url(/assets/images/bg/bg-image-12.jpg);
+>>>>>>> ca9b783 (first commit)
 }
 
 .bg_image--13 {
@@ -9441,7 +9449,11 @@ xclip
 }
 .header-top-news.bg-image1,
 .header-top-news-2.bg-image1 {
+<<<<<<< HEAD
   /* background-image: url(/assets/images/header-top/top-banner.png); */
+=======
+  background-image: url(/assets/images/header-top/top-banner.png);
+>>>>>>> ca9b783 (first commit)
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -9528,7 +9540,11 @@ xclip
 }
 
 .header-top-news-2 .bg-image1 {
+<<<<<<< HEAD
   /* background-image: url(/assets/images/header-top/top-banner.png); */
+=======
+  background-image: url(/assets/images/header-top/top-banner.png);
+>>>>>>> ca9b783 (first commit)
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -10104,7 +10120,11 @@ div.btn-default.btn-extra-large {
 a.btn-default.btn-border,
 button.btn-default.btn-border,
 div.btn-default.btn-border {
+<<<<<<< HEAD
   /* background-image: inherit; */
+=======
+  background-image: inherit;
+>>>>>>> ca9b783 (first commit)
   border-color: var(--color-border);
   border-width: 2px;
   border-style: solid;
@@ -14997,8 +15017,13 @@ iframe {
 
 .slider-area .inner a.btn-default.btn-border,
 .slider-area .inner button.btn-default.btn-border {
+<<<<<<< HEAD
   border-color: var(--color-border) !important;
   color: var(--color-primary) !important;
+=======
+  border-color: var(--color-border);
+  color: var(--color-white);
+>>>>>>> ca9b783 (first commit)
 }
 
 /*-----------------------
@@ -16790,6 +16815,7 @@ body.active-light-mode
 .logo img {
   width: fit-content;
 }
+<<<<<<< HEAD
 
 html {
   scroll-behavior: smooth;
@@ -16955,3 +16981,5 @@ html {
 .custom-modal .duplicate-account-modal {
   z-index: 99999 !important;
 }
+=======
+>>>>>>> ca9b783 (first commit)

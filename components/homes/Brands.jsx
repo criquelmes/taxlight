@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import React from "react";
@@ -8,6 +9,12 @@ import { useTheme } from "../../hooks/useTheme";
 export default function Brands() {
   const theme = useTheme();
 
+=======
+import React from "react";
+import Image from "next/image";
+import { brandImages } from "@/data/brands";
+export default function Brands() {
+>>>>>>> ca9b783 (first commit)
   return (
     <div className="rainbow-brand-area pt--80 pb--80">
       <div className="container">
@@ -34,7 +41,11 @@ export default function Brands() {
                   <a href="https://ledgifi.com/chile" target="_blank">
                     <Image
                       alt={image.alt}
+<<<<<<< HEAD
                       src={theme === "dark" ? image.srcDark : image.srcLight}
+=======
+                      src={image.src}
+>>>>>>> ca9b783 (first commit)
                       width={232}
                       height={110}
                     />

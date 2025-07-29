@@ -4,8 +4,12 @@ import Nav from "./Nav";
 import Image from "next/image";
 import Link from "next/link";
 import ModeSwitcher from "../common/ModeSwitcher";
+<<<<<<< HEAD
 import { openMenu } from "../../utlis/toggleMenu";
 
+=======
+import { openMenu } from "@/utlis/toggleMenu";
+>>>>>>> ca9b783 (first commit)
 export default function Header2({
   parentClass = "rainbow-header header-default header-left-align header-not-transparent header-sticky",
   btnClass = "btn-default btn-small round",
@@ -44,8 +48,13 @@ export default function Header2({
                 </ul>
               </nav>
               <div className="header-btn">
+<<<<<<< HEAD
                 <a className={btnClass} href="/suscripcion">
                   Suscribirme
+=======
+                <a className={btnClass} target="_blank" href="/purshase">
+                  Contratar
+>>>>>>> ca9b783 (first commit)
                 </a>
               </div>
               {/* Start Mobile-Menu-Bar */}
@@ -56,8 +65,15 @@ export default function Header2({
                   </button>
                 </div>
               </div>
+<<<<<<< HEAD
               {/* Start Switcher Area  */}
               <ModeSwitcher />
+=======
+              {/* Start Mobile-Menu-Bar */}
+              {/* Start Switcher Area  */}
+              <ModeSwitcher />
+              {/* Start Switcher Area  */}
+>>>>>>> ca9b783 (first commit)
             </div>
           </div>
         </div>
