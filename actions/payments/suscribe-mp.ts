@@ -25,11 +25,14 @@ export async function suscribe(formData: FormData) {
       selectedProducts,
     });
 
+    // ✅ La función api.user.suscribe() YA maneja las transacciones internamente
+    // No necesitas manejar transacciones aquí
     const result = await api.user.suscribe(
       email,
       name,
       subscriptionType || "monthly",
       includeBite
+      // ❌ No pasar { transaction } - la función solo acepta 4 parámetros
     );
 
     console.log("Subscription created:", result);
