@@ -10,7 +10,6 @@ async function createExternalAccount(userData: {
   email: string;
   name: string;
   products: string[];
-  orderId: string;
 }) {
   try {
     console.log(`🔧 Creando cuenta externa para: ${userData.email}`);
@@ -223,7 +222,6 @@ async function processPreapprovalStatus(preapproval: any, order: any) {
 
       if (!order.isPaid) {
         try {
-          // ✅ USAR LA FUNCIÓN confirmPayment QUE YA MANEJA LA CUENTA EXTERNA
           console.log(
             `🔍 [WEBHOOK] Iniciando confirmPayment para orden: ${orderId}`
           );
@@ -234,11 +232,35 @@ async function processPreapprovalStatus(preapproval: any, order: any) {
             `✅ [WEBHOOK] Pago confirmado exitosamente para orden ${confirmedOrder.id}`
           );
 
-          // Verificar si hubo error en cuenta externa
+          // ✅ VERIFICAR RESULTADO DE CUENTA EXTERNA
           if (confirmedOrder._metadata?.externalAccountError) {
             console.warn(
               `⚠️ [WEBHOOK] Pago OK pero error en cuenta externa: ${confirmedOrder._metadata.externalAccountErrorMessage}`
             );
+
+            // ✅ SI ES RETRYABLE, PROGRAMAR UN RETRY
+            if (confirmedOrder._metadata.externalAccountRetryable) {
+              console.log(
+                `🔄 [WEBHOOK] Error retryable - se programará retry automático`
+              );
+
+              // Opcionalmente, puedes programar un job para retry más tarde
+              // setTimeout(() => {
+              //   api.order.retryPendingExternalAccounts();
+              // }, 5 * 60 * 1000); // Retry en 5 minutos
+            } else {
+              console.error(
+                `🚨 [WEBHOOK] Error no retryable - requiere intervención manual para orden ${orderId}`
+              );
+
+              // Enviar notificación a administradores
+              // await sendAdminNotification({
+              //   type: "EXTERNAL_ACCOUNT_ERROR",
+              //   orderId,
+              //   userEmail: order.user.email,
+              //   error: confirmedOrder._metadata.externalAccountErrorMessage
+              // });
+            }
           } else {
             console.log(
               `🎉 [WEBHOOK] Pago y cuenta externa exitosos para ${order.user.email}`
@@ -247,7 +269,7 @@ async function processPreapprovalStatus(preapproval: any, order: any) {
         } catch (error) {
           console.error("❌ [WEBHOOK] Error confirmando pago:", error);
 
-          // Rollback si falla
+          // Rollback si falla la confirmación de pago completamente
           await api.order.rollbackTransaction(
             orderId,
             "Payment confirmation failed in webhook"
@@ -258,6 +280,25 @@ async function processPreapprovalStatus(preapproval: any, order: any) {
         console.log(
           `ℹ️ [WEBHOOK] Orden ${orderId} ya estaba marcada como pagada`
         );
+
+        // ✅ VERIFICAR SI TIENE PROBLEMAS DE CUENTA EXTERNA PENDIENTES
+        if (order.notes?.includes("EXTERNAL_ACCOUNT_PENDING")) {
+          console.log(
+            `🔄 [WEBHOOK] Orden ya pagada pero tiene cuenta externa pendiente - intentando retry`
+          );
+
+          try {
+            await api.utils.createExternalAccountForOrder(orderId);
+            console.log(
+              `✅ [WEBHOOK] Cuenta externa creada en retry para orden ${orderId}`
+            );
+          } catch (retryError) {
+            console.error(
+              `❌ [WEBHOOK] Falló retry de cuenta externa:`,
+              retryError
+            );
+          }
+        }
       }
       break;
 

@@ -372,6 +372,166 @@ async function createExternalAccount(userData: {
   }
 }
 
+// ✅ NUEVA FUNCIÓN PARA RETRY DE CUENTAS EXTERNAS PENDIENTES
+async function retryPendingExternalAccounts() {
+  try {
+    console.log("🔄 Buscando órdenes con cuentas externas pendientes...");
+
+    // Buscar órdenes pagadas que tienen problemas de cuenta externa
+    const ordersWithPendingAccounts = await prisma.order.findMany({
+      where: {
+        isPaid: true,
+        isActive: true,
+        notes: {
+          contains: "EXTERNAL_ACCOUNT_PENDING",
+        },
+      },
+      include: {
+        user: true,
+        orderSubscriptions: {
+          include: {
+            subscription: {
+              include: { products: true },
+            },
+          },
+        },
+      },
+    });
+
+    console.log(
+      `🔍 Encontradas ${ordersWithPendingAccounts.length} órdenes con cuentas externas pendientes`
+    );
+
+    const retryResults = [];
+
+    for (const order of ordersWithPendingAccounts) {
+      try {
+        console.log(`🔄 Reintentando cuenta externa para orden ${order.id}...`);
+
+        // Parsear información de la transacción
+        const transactionInfo = order.transactionId?.split("-");
+        const includeBite = transactionInfo?.[1] === "bite";
+        const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
+
+        await createExternalAccount({
+          email: order.user.email,
+          name: order.user.name,
+          products: products,
+        });
+
+        // ✅ LIMPIAR LA MARCA DE PENDIENTE
+        await prisma.order.update({
+          where: { id: order.id },
+          data: {
+            notes:
+              order.notes?.replace(/EXTERNAL_ACCOUNT_PENDING:.*/, "").trim() ||
+              null,
+          },
+        });
+
+        await createSubscriptionLog(
+          "REACTIVATED",
+          order.id,
+          order.userId,
+          `✅ Cuenta externa creada exitosamente en retry para ${order.user.email}`
+        );
+
+        retryResults.push({
+          orderId: order.id,
+          userEmail: order.user.email,
+          status: "success",
+        });
+
+        console.log(
+          `✅ Cuenta externa creada en retry para ${order.user.email}`
+        );
+      } catch (retryError) {
+        console.error(`❌ Error en retry para orden ${order.id}:`, retryError);
+
+        retryResults.push({
+          orderId: order.id,
+          userEmail: order.user.email,
+          status: "failed",
+          error:
+            retryError instanceof Error
+              ? retryError.message
+              : "Error desconocido",
+        });
+      }
+    }
+
+    const summary = {
+      totalPending: ordersWithPendingAccounts.length,
+      successful: retryResults.filter((r) => r.status === "success").length,
+      failed: retryResults.filter((r) => r.status === "failed").length,
+      results: retryResults,
+    };
+
+    console.log("📊 Resumen de retry de cuentas externas:", summary);
+    return summary;
+  } catch (error) {
+    console.error("❌ Error en retry de cuentas externas:", error);
+    throw error;
+  }
+}
+
+// ✅ FUNCIÓN PARA OBTENER ÓRDENES CON PROBLEMAS DE CUENTA EXTERNA
+async function getOrdersWithExternalAccountIssues() {
+  try {
+    const ordersWithIssues = await prisma.order.findMany({
+      where: {
+        isPaid: true,
+        notes: {
+          contains: "EXTERNAL_ACCOUNT_PENDING",
+        },
+      },
+      include: {
+        user: true,
+        orderSubscriptions: {
+          include: {
+            subscription: {
+              include: { products: true },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return ordersWithIssues.map((order) => {
+      const errorMessage =
+        order.notes?.match(/EXTERNAL_ACCOUNT_PENDING: (.+)/)?.[1] ||
+        "Error desconocido";
+      const transactionInfo = order.transactionId?.split("-");
+      const includeBite = transactionInfo?.[1] === "bite";
+      const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
+
+      return {
+        orderId: order.id,
+        userEmail: order.user.email,
+        userName: order.user.name,
+        products: products,
+        subscriptionName: order.orderSubscriptions[0]?.subscription.name,
+        paidAt: order.paidAt,
+        errorMessage: errorMessage,
+        daysSincePayment: order.paidAt
+          ? Math.floor(
+              (Date.now() - order.paidAt.getTime()) / (1000 * 60 * 60 * 24)
+            )
+          : null,
+      };
+    });
+  } catch (error) {
+    console.error(
+      "❌ Error obteniendo órdenes con problemas de cuenta externa:",
+      error
+    );
+    throw error;
+  }
+}
+
 const api = {
   user: {
     // ✅ FUNCIÓN PRINCIPAL CON TRANSACCIONES Y CUENTA EXTERNA AL FINAL
@@ -789,9 +949,8 @@ const api = {
         const startsAt = paidAt;
         const expiresAt = calculateExpirationDate(paidAt, subscriptionType);
 
-        // ✅ USAR TRANSACCIÓN PARA CONFIRMAR PAGO Y CREAR CUENTA EXTERNA
+        // PASO 1: ✅ CONFIRMAR PAGO PRIMERO (SIN CUENTA EXTERNA)
         const confirmedOrder = await prisma.$transaction(async (tx) => {
-          // Actualizar la orden como pagada
           const updatedOrder = await tx.order.update({
             where: { id: orderId },
             data: {
@@ -814,7 +973,6 @@ const api = {
             },
           });
 
-          // Actualizar la suscripción como activa
           await tx.orderSubscription.update({
             where: {
               orderId_subscriptionId: {
@@ -830,77 +988,39 @@ const api = {
             },
           });
 
-          // ✅ CREAR CUENTA EXTERNA AHORA QUE EL PAGO ESTÁ CONFIRMADO
-          const transactionInfo = existingOrder.transactionId!.split("-");
-          const includeBite = transactionInfo[1] === "bite";
-          const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
-
-          let externalAccountError = false;
-          let externalAccountErrorMessage = "";
-
-          try {
-            console.log(
-              `🔧 Creando cuenta externa después del pago exitoso...`
-            );
-
-            // ✅ VERIFICAR SI LA CUENTA YA FUE CREADA DURANTE LA VALIDACIÓN
-            // Esto puede pasar si la validación devolvió 200/201 en lugar de solo verificar
-            const createResult = await createExternalAccount({
-              email: existingOrder.user.email,
-              name: existingOrder.user.name,
-              products: products,
-            });
-
-            console.log(
-              `✅ Cuenta externa procesada exitosamente para ${existingOrder.user.email}`
-            );
-          } catch (externalError) {
-            console.error(`❌ Error creando cuenta externa:`, externalError);
-
-            // ✅ SI EL ERROR ES 409, SIGNIFICA QUE LA CUENTA YA EXISTE (VALIDACIÓN LA CREÓ)
-            if (
-              externalError instanceof Error &&
-              externalError.message.includes("409")
-            ) {
-              console.log(
-                `ℹ️ Cuenta externa ya existía (creada durante validación) para ${existingOrder.user.email}`
-              );
-              // No es un error real, la cuenta ya está creada
-            } else {
-              // ✅ OTROS ERRORES SÍ SON PROBLEMÁTICOS
-              externalAccountError = true;
-              externalAccountErrorMessage =
-                externalError instanceof Error
-                  ? externalError.message
-                  : "Error desconocido";
-
-              await createSubscriptionLog(
-                "ACTIVATED",
-                orderId,
-                existingOrder.userId,
-                `⚠️ Suscripción ${subscriptionType} activada hasta ${expiresAt.toISOString()} pero falló creación de cuenta externa: ${externalAccountErrorMessage}`
-              );
-            }
-          }
-
-          // ✅ RETORNAR ORDEN CON INFORMACIÓN DE ERROR EXTERNA
-          return {
-            ...updatedOrder,
-            // Agregar propiedades personalizadas de forma que TypeScript las entienda
-            _metadata: {
-              externalAccountError,
-              externalAccountErrorMessage,
-            },
-          };
+          return updatedOrder;
         });
 
-        const products =
-          existingOrder.orderSubscriptions[0]?.subscription.products?.map(
-            (p) => p.name
-          ) || [];
+        // PASO 2: ✅ CREAR CUENTA EXTERNA DESPUÉS (FUERA DE LA TRANSACCIÓN)
+        const transactionInfo = existingOrder.transactionId!.split("-");
+        const includeBite = transactionInfo[1] === "bite";
+        const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
 
-        // Log de éxito (solo si no hubo error en cuenta externa)
-        if (!confirmedOrder._metadata.externalAccountError) {
+        let externalAccountResult = {
+          success: false,
+          error: "",
+          retryable: true,
+        };
+
+        try {
+          console.log(`🔧 Creando cuenta externa después del pago exitoso...`);
+
+          await createExternalAccount({
+            email: existingOrder.user.email,
+            name: existingOrder.user.name,
+            products: products,
+          });
+
+          externalAccountResult = {
+            success: true,
+            error: "",
+            retryable: false,
+          };
+
+          console.log(
+            `✅ Cuenta externa creada exitosamente para ${existingOrder.user.email}`
+          );
+
           await createSubscriptionLog(
             "ACTIVATED",
             orderId,
@@ -909,6 +1029,51 @@ const api = {
               ", "
             )}. Cuenta externa creada exitosamente.`
           );
+        } catch (externalError) {
+          console.error(`❌ Error creando cuenta externa:`, externalError);
+
+          // Determinar si es un error temporal o permanente
+          const errorMessage =
+            externalError instanceof Error
+              ? externalError.message
+              : "Error desconocido";
+          const isRetryable =
+            !errorMessage.includes("409") &&
+            !errorMessage.includes("validation");
+
+          externalAccountResult = {
+            success: false,
+            error: errorMessage,
+            retryable: isRetryable,
+          };
+
+          // ✅ MARCAR LA ORDEN PARA RETRY DE CUENTA EXTERNA
+          await prisma.order.update({
+            where: { id: orderId },
+            data: {
+              // Agregar un campo para marcar que necesita retry de cuenta externa
+              // Puedes usar el campo notes o crear uno nuevo
+              notes: `EXTERNAL_ACCOUNT_PENDING: ${errorMessage}`,
+            },
+          });
+
+          await createSubscriptionLog(
+            "ACTIVATED",
+            orderId,
+            existingOrder.userId,
+            `⚠️ Suscripción ${subscriptionType} activada hasta ${expiresAt.toISOString()} pero falló creación de cuenta externa: ${errorMessage}. ${
+              isRetryable
+                ? "Se intentará nuevamente."
+                : "Requiere intervención manual."
+            }`
+          );
+
+          // ✅ SI ES UN ERROR NO RETRYABLE, PROGRAMAR PARA REVISIÓN MANUAL
+          if (!isRetryable) {
+            console.error(
+              `🚨 Error no retryable en cuenta externa para orden ${orderId}. Requiere revisión manual.`
+            );
+          }
         }
 
         console.log(
@@ -918,7 +1083,14 @@ const api = {
           `📅 Subscription active from ${startsAt.toISOString()} to ${expiresAt.toISOString()}`
         );
 
-        return confirmedOrder;
+        return {
+          ...confirmedOrder,
+          _metadata: {
+            externalAccountError: !externalAccountResult.success,
+            externalAccountErrorMessage: externalAccountResult.error,
+            externalAccountRetryable: externalAccountResult.retryable,
+          },
+        };
       } catch (error) {
         console.error("❌ Error confirming payment:", error);
         throw error;
@@ -1259,6 +1431,8 @@ const api = {
         throw error;
       }
     },
+    retryPendingExternalAccounts,
+    getOrdersWithExternalAccountIssues,
   },
 
   subscription: {

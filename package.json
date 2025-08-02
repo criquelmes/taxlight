@@ -8,7 +8,7 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "seed": "ts-node seed/seed-subscriptions.ts"
+    "seed": "ts-node seed/master-seed.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
