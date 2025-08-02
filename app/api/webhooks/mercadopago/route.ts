@@ -9,8 +9,13 @@ export async function POST(request: NextRequest) {
   console.log("🚨 WEBHOOK LLEGÓ - Timestamp:", new Date().toISOString());
   console.log("🚨 Headers:", Object.fromEntries(request.headers.entries()));
   console.log("🚨 URL completa:", request.url);
+
   try {
-    const body: { data: { id: string }; type: string } = await request.json();
+    const body: {
+      data: { id: string };
+      type?: string;
+      action?: string;
+    } = await request.json();
 
     console.log(
       "🔔 Webhook recibido de MercadoPago:",
@@ -18,7 +23,7 @@ export async function POST(request: NextRequest) {
     );
 
     // ✅ Validar estructura del body
-    if (!body?.data?.id || !body?.type) {
+    if (!body?.data?.id) {
       console.error("❌ Body del webhook inválido:", body);
       return NextResponse.json(
         { error: "Invalid webhook body" },
@@ -26,8 +31,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ✅ Manejar tipo 'preapproval'
-    if (body.type === "preapproval") {
+    // Determinar el tipo de evento
+    const eventType = body.type || body.action || "unknown";
+    console.log(`🔔 Evento recibido: ${eventType}`);
+
+    // ✅ Manejar tipo 'preapproval' (suscripciones)
+    if (eventType === "preapproval") {
       console.log(`🔔 Procesando webhook preapproval: ${body.data.id}`);
 
       try {
@@ -91,9 +100,31 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         );
       }
-    } else {
-      console.log(`ℹ️ Tipo de webhook ignorado: ${body.type}`);
-      return NextResponse.json({ received: true });
+    }
+    // ✅ Manejar eventos de payment
+    else if (eventType === "payment" || eventType.startsWith("payment.")) {
+      console.log(
+        `💳 Webhook de payment recibido: ${eventType} - ID: ${body.data.id}`
+      );
+
+      // Para pagos, simplemente confirmar recepción
+      // Los pagos de suscripciones se manejan via preapproval
+      return NextResponse.json({
+        received: true,
+        eventType: eventType,
+        paymentId: body.data.id,
+        message:
+          "Payment webhook received but not processed (subscription handled via preapproval)",
+      });
+    }
+    // ✅ TODOS LOS DEMÁS TIPOS
+    else {
+      console.log(`ℹ️ Tipo de webhook ignorado: ${eventType}`);
+      return NextResponse.json({
+        received: true,
+        eventType: eventType,
+        message: "Webhook type not processed",
+      });
     }
   } catch (error) {
     console.error("💥 Error general procesando webhook:", error);
