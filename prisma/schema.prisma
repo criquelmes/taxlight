@@ -84,6 +84,7 @@ model Order {
 
   transactionId    String?
   mpSubscriptionId String?
+  notes            String?
 
   @@index([userId])
   @@index([isPaid])
