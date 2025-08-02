@@ -36,7 +36,10 @@ export async function POST(request: NextRequest) {
     console.log(`🔔 Evento recibido: ${eventType}`);
 
     // ✅ Manejar tipo 'preapproval' (suscripciones)
-    if (eventType === "preapproval") {
+    if (
+      eventType === "preapproval" ||
+      eventType === "subscription_preapproval"
+    ) {
       console.log(`🔔 Procesando webhook preapproval: ${body.data.id}`);
 
       try {
