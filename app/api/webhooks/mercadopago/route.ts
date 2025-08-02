@@ -5,94 +5,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// ✅ FUNCIÓN CORREGIDA PARA CREAR CUENTA EXTERNA
-async function createExternalAccount(userData: {
-  email: string;
-  name: string;
-  products: string[];
-}) {
-  try {
-    console.log(`🔧 Creando cuenta externa para: ${userData.email}`);
-    console.log(`🎯 Productos: ${userData.products.join(", ")}`);
-
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL
-      ? `https://${process.env.NEXT_PUBLIC_API_URL}/accounts/`
-      : "https://backend.taxlight.cl/accounts/";
-
-    const accountData = {
-      email: userData.email,
-      name: userData.name,
-      product: userData.products.map((product) => product.toLowerCase()),
-    };
-
-    console.log(`📦 Creando con datos:`, JSON.stringify(accountData, null, 2));
-    console.log(`🌐 URL: ${backendUrl}`);
-
-    const response = await fetch(backendUrl, {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "X-API-Key": process.env.EXTERNAL_API_TOKEN!,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(accountData),
-    });
-
-    let result;
-    try {
-      result = await response.json();
-    } catch (jsonError) {
-      const textResponse = await response.text();
-      console.error(`❌ Respuesta de creación no es JSON:`, textResponse);
-      throw new Error(
-        `Respuesta inválida del servicio externo: ${textResponse}`
-      );
-    }
-
-    if (response.status === 200 || response.status === 201) {
-      // ✅ Cuenta creada exitosamente
-      console.log(
-        `✅ Cuenta externa creada exitosamente para ${userData.email}`
-      );
-      return {
-        success: true,
-        message: "Cuenta creada exitosamente",
-        data: result,
-        alreadyExisted: false,
-      };
-    }
-
-    if (response.status === 409) {
-      // ✅ Cuenta ya existe - esto es OK
-      console.log(`ℹ️ Cuenta externa ya existe para ${userData.email} (409)`);
-      return {
-        success: true,
-        message: "Cuenta ya existía",
-        data: result,
-        alreadyExisted: true,
-      };
-    }
-
-    // ❌ Otros errores sí son problemáticos
-    console.error(
-      `❌ Error creando cuenta externa (${response.status}):`,
-      result
-    );
-    throw new Error(
-      `Error al crear cuenta externa: ${response.status} - ${JSON.stringify(
-        result
-      )}`
-    );
-  } catch (error) {
-    console.error(`❌ Error durante creación de cuenta externa:`, error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
 export async function POST(request: NextRequest) {
+  console.log("🚨 WEBHOOK LLEGÓ - Timestamp:", new Date().toISOString());
+  console.log("🚨 Headers:", Object.fromEntries(request.headers.entries()));
+  console.log("🚨 URL completa:", request.url);
   try {
     const body: { data: { id: string }; type: string } = await request.json();
 
