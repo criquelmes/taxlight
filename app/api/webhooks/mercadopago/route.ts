@@ -5,36 +5,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Función para crear logs de auditoría (mantener tu implementación)
-async function createSubscriptionLog(
-  action:
-    | "CREATED"
-    | "ACTIVATED"
-    | "RENEWED"
-    | "EXPIRED"
-    | "CANCELLED"
-    | "SUSPENDED"
-    | "REACTIVATED",
-  orderId: string,
-  userId: string,
-  details?: string
-) {
-  try {
-    await prisma.subscriptionLog.create({
-      data: {
-        action,
-        orderId,
-        userId,
-        details,
-      },
-    });
-    console.log(`📝 Log creado: ${action} para order ${orderId}`);
-  } catch (error) {
-    console.error("❌ Error creando log:", error);
-  }
-}
-
-// Función para verificar/crear cuenta externa (mantener tu implementación mejorada)
+// ✅ FUNCIÓN CORREGIDA PARA CREAR CUENTA EXTERNA
 async function createExternalAccount(userData: {
   email: string;
   name: string;
@@ -42,28 +13,21 @@ async function createExternalAccount(userData: {
   orderId: string;
 }) {
   try {
-    console.log(
-      `📤 Verificando/Creando cuenta externa para: ${userData.email}`
-    );
+    console.log(`🔧 Creando cuenta externa para: ${userData.email}`);
     console.log(`🎯 Productos: ${userData.products.join(", ")}`);
-
-    const productNames = userData.products.map((product) =>
-      product.toLowerCase()
-    );
-
-    const accountData = {
-      email: userData.email,
-      name: userData.name,
-      product: productNames,
-    };
-
-    console.log(`📦 Datos a enviar:`, JSON.stringify(accountData, null, 2));
 
     const backendUrl = process.env.NEXT_PUBLIC_API_URL
       ? `https://${process.env.NEXT_PUBLIC_API_URL}/accounts/`
       : "https://backend.taxlight.cl/accounts/";
 
-    console.log(`🌐 Enviando request a: ${backendUrl}`);
+    const accountData = {
+      email: userData.email,
+      name: userData.name,
+      product: userData.products.map((product) => product.toLowerCase()),
+    };
+
+    console.log(`📦 Creando con datos:`, JSON.stringify(accountData, null, 2));
+    console.log(`🌐 URL: ${backendUrl}`);
 
     const response = await fetch(backendUrl, {
       method: "POST",
@@ -80,50 +44,48 @@ async function createExternalAccount(userData: {
       result = await response.json();
     } catch (jsonError) {
       const textResponse = await response.text();
-      console.error(`❌ Respuesta no es JSON válido:`, textResponse);
-      throw new Error(`Invalid JSON response: ${textResponse}`);
+      console.error(`❌ Respuesta de creación no es JSON:`, textResponse);
+      throw new Error(
+        `Respuesta inválida del servicio externo: ${textResponse}`
+      );
     }
 
-    if (response.status === 409) {
+    if (response.status === 200 || response.status === 201) {
+      // ✅ Cuenta creada exitosamente
       console.log(
-        `✅ Cuenta ya existe para ${userData.email} (pre-validada):`,
-        result
+        `✅ Cuenta externa creada exitosamente para ${userData.email}`
       );
       return {
         success: true,
-        externalAccountId: userData.email,
+        message: "Cuenta creada exitosamente",
+        data: result,
+        alreadyExisted: false,
+      };
+    }
+
+    if (response.status === 409) {
+      // ✅ Cuenta ya existe - esto es OK
+      console.log(`ℹ️ Cuenta externa ya existe para ${userData.email} (409)`);
+      return {
+        success: true,
+        message: "Cuenta ya existía",
         data: result,
         alreadyExisted: true,
       };
     }
 
-    if (!response.ok) {
-      console.error(`❌ Error HTTP ${response.status}:`, result);
-      throw new Error(
-        `HTTP error! status: ${response.status}, message: ${JSON.stringify(
-          result
-        )}`
-      );
-    }
-
-    console.log(`✅ Cuenta externa creada exitosamente:`, result);
-
-    let externalAccountId = userData.email;
-    if (result?.status === "Success") {
-      externalAccountId =
-        result.account_details?.email ||
-        result.account_details?.id ||
-        userData.email;
-    }
-
-    return {
-      success: true,
-      externalAccountId: externalAccountId,
-      data: result,
-      alreadyExisted: false,
-    };
+    // ❌ Otros errores sí son problemáticos
+    console.error(
+      `❌ Error creando cuenta externa (${response.status}):`,
+      result
+    );
+    throw new Error(
+      `Error al crear cuenta externa: ${response.status} - ${JSON.stringify(
+        result
+      )}`
+    );
   } catch (error) {
-    console.error(`❌ Error creando cuenta externa:`, error);
+    console.error(`❌ Error durante creación de cuenta externa:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
@@ -140,7 +102,7 @@ export async function POST(request: NextRequest) {
       JSON.stringify(body, null, 2)
     );
 
-    // CORRECCIÓN: Validar estructura del body
+    // ✅ Validar estructura del body
     if (!body?.data?.id || !body?.type) {
       console.error("❌ Body del webhook inválido:", body);
       return NextResponse.json(
@@ -149,7 +111,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // CORRECCIÓN: El tipo correcto es 'preapproval', no 'subscription_preapproval'
+    // ✅ Manejar tipo 'preapproval'
     if (body.type === "preapproval") {
       console.log(`🔔 Procesando webhook preapproval: ${body.data.id}`);
 
@@ -195,7 +157,7 @@ export async function POST(request: NextRequest) {
           `📦 Orden encontrada: ${order.id} para usuario ${order.user.email}`
         );
 
-        // Manejar diferentes estados de la suscripción
+        // Procesar según el estado
         await processPreapprovalStatus(preapproval, order);
 
         return NextResponse.json({
@@ -210,26 +172,18 @@ export async function POST(request: NextRequest) {
           preapprovalError
         );
         return NextResponse.json(
-          {
-            received: true,
-            error: "Error processing preapproval",
-          },
+          { received: true, error: "Error processing preapproval" },
           { status: 500 }
         );
       }
     } else {
-      // Otros tipos de notificación
       console.log(`ℹ️ Tipo de webhook ignorado: ${body.type}`);
       return NextResponse.json({ received: true });
     }
   } catch (error) {
     console.error("💥 Error general procesando webhook:", error);
-
     return NextResponse.json(
-      {
-        error: "Internal server error",
-        timestamp: new Date().toISOString(),
-      },
+      { error: "Internal server error", timestamp: new Date().toISOString() },
       { status: 500 }
     );
   }
@@ -245,7 +199,6 @@ async function processPreapprovalStatus(preapproval: any, order: any) {
     case "pending":
       console.log(`⏳ Procesando estado 'pending' para orden ${orderId}`);
 
-      // Solo establecer transaction ID si no está ya pagado
       if (!order.isPaid) {
         const setResult = await api.order.setTransactionId(
           orderId,
@@ -265,127 +218,81 @@ async function processPreapprovalStatus(preapproval: any, order: any) {
       break;
 
     case "authorized":
-    case "approved": // Agregar 'approved' como estado válido
+    case "approved":
       console.log(`💰 Procesando pago autorizado para orden ${orderId}`);
 
-      // Solo procesar si no está ya pagado
       if (!order.isPaid) {
         try {
-          // Confirmar el pago en nuestra base de datos
+          // ✅ USAR LA FUNCIÓN confirmPayment QUE YA MANEJA LA CUENTA EXTERNA
+          console.log(
+            `🔍 [WEBHOOK] Iniciando confirmPayment para orden: ${orderId}`
+          );
+
           const confirmedOrder = await api.order.confirmPayment(orderId);
-          console.log(`✅ Pago confirmado para orden ${confirmedOrder.id}`);
 
-          // Extraer información de la suscripción
-          const subscription = order.orderSubscriptions[0]?.subscription;
-          const subscriptionName = subscription?.name || "unknown";
-          const products = subscription?.products?.map((p) => p.name) || [];
+          console.log(
+            `✅ [WEBHOOK] Pago confirmado exitosamente para orden ${confirmedOrder.id}`
+          );
 
-          console.log(`📋 Suscripción: ${subscriptionName}`);
-          console.log(`🎯 Productos incluidos: ${products.join(", ")}`);
-
-          // Verificar/crear cuenta en API externa
-          console.log(`🔍 Verificando estado de cuenta externa...`);
-
-          const accountCreation = await createExternalAccount({
-            email: order.user.email,
-            name: order.user.name,
-            products: products,
-            orderId: order.id,
-          });
-
-          if (accountCreation.success) {
-            const statusMessage = accountCreation.alreadyExisted
-              ? "cuenta externa ya existía (pre-validada)"
-              : "cuenta externa creada";
-
-            console.log(
-              `🎉 ÉXITO: Pago confirmado - ${statusMessage} para ${order.user.email}`
-            );
-
-            await createSubscriptionLog(
-              "ACTIVATED",
-              order.id,
-              order.userId,
-              `Suscripción ${subscriptionName} activada - ${statusMessage} - Productos: ${products.join(
-                ", "
-              )}`
+          // Verificar si hubo error en cuenta externa
+          if (confirmedOrder._metadata?.externalAccountError) {
+            console.warn(
+              `⚠️ [WEBHOOK] Pago OK pero error en cuenta externa: ${confirmedOrder._metadata.externalAccountErrorMessage}`
             );
           } else {
-            console.error(
-              `❌ FALLO EN CUENTA EXTERNA: Pago confirmado para ${order.user.email} pero falló verificación: ${accountCreation.error}`
-            );
-
-            await createSubscriptionLog(
-              "ACTIVATED",
-              order.id,
-              order.userId,
-              `Suscripción activada pero cuenta externa falló: ${accountCreation.error}`
+            console.log(
+              `🎉 [WEBHOOK] Pago y cuenta externa exitosos para ${order.user.email}`
             );
           }
         } catch (error) {
-          console.error("❌ Error confirmando pago:", error);
+          console.error("❌ [WEBHOOK] Error confirmando pago:", error);
 
-          // Rollback si falla la confirmación del pago
+          // Rollback si falla
           await api.order.rollbackTransaction(
             orderId,
-            "Payment confirmation failed"
+            "Payment confirmation failed in webhook"
           );
           throw error;
         }
       } else {
-        console.log(`ℹ️ Orden ${orderId} ya estaba marcada como pagada`);
+        console.log(
+          `ℹ️ [WEBHOOK] Orden ${orderId} ya estaba marcada como pagada`
+        );
       }
       break;
 
     case "cancelled":
     case "paused":
     case "rejected":
-      console.log(`❌ Suscripción ${status} para orden ${orderId}`);
+      console.log(`❌ [WEBHOOK] Suscripción ${status} para orden ${orderId}`);
 
-      // Solo hacer rollback si no está pagado
       if (!order.isPaid) {
         const rollbackResult = await api.order.rollbackTransaction(
           orderId,
-          `Subscription ${status}`
+          `Subscription ${status} via webhook`
         );
 
         if (rollbackResult.ok) {
           console.log(
-            `🔄 Rollback exitoso para orden ${orderId} debido a ${status}`
+            `🔄 [WEBHOOK] Rollback exitoso para orden ${orderId} debido a ${status}`
           );
         } else {
-          console.error(
-            `❌ Rollback falló para orden ${orderId}:`,
-            rollbackResult.message
-          );
+          console.error(`❌ [WEBHOOK] Rollback falló:`, rollbackResult.message);
         }
       }
-
-      await createSubscriptionLog(
-        "CANCELLED",
-        order.id,
-        order.userId,
-        `Suscripción ${status} por MercadoPago`
-      );
       break;
 
     default:
-      console.warn(`⚠️ Estado de preapproval no manejado: ${status}`);
-
-      await createSubscriptionLog(
-        "CREATED",
-        order.id,
-        order.userId,
-        `Estado no manejado recibido: ${status}`
-      );
+      console.warn(`⚠️ [WEBHOOK] Estado no manejado: ${status}`);
   }
 }
 
-// Endpoint GET para verificar que el webhook está funcionando
+// ✅ Endpoint GET para verificar funcionamiento
 export async function GET() {
   return NextResponse.json({
     message: "MercadoPago webhook endpoint is working",
     timestamp: new Date().toISOString(),
-    version: "2.0",
+    version: "2.1 - Fixed",
+    environment: process.env.NODE_ENV,
   });
 }
