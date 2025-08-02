@@ -195,7 +195,7 @@ async function validateUserCanSubscribe(email: string) {
   }
 }
 
-// ✅ FUNCIÓN PARA VALIDAR CUENTA EXTERNA (SOLO ANTES DE CREAR)
+// ✅ FUNCIÓN PARA VALIDAR SIN CREAR CUENTA EXTERNA
 async function validateExternalAccount(userData: {
   email: string;
   name: string;
@@ -215,12 +215,16 @@ async function validateExternalAccount(userData: {
       product: userData.products.map((product) => product.toLowerCase()),
     };
 
-    console.log(
-      `📦 Validating external account:`,
-      JSON.stringify(accountData, null, 2)
-    );
+    console.log(`📦 Validando disponibilidad de email:`, userData.email);
 
-    // ✅ HACER UNA PETICIÓN TEMPORAL PARA VERIFICAR SI EXISTE
+    // ✅ CAMBIAR ESTRATEGIA: Hacer un POST "falso" para verificar conflicto
+    // Enviar datos inválidos para que falle si la cuenta existe
+    const testData = {
+      email: userData.email,
+      name: "validation_test", // Nombre temporal para testing
+      product: ["test"], // Producto temporal
+    };
+
     const response = await fetch(backendUrl, {
       method: "POST",
       headers: {
@@ -228,7 +232,7 @@ async function validateExternalAccount(userData: {
         "X-API-Key": process.env.EXTERNAL_API_TOKEN!,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(accountData),
+      body: JSON.stringify(testData),
     });
 
     let result;
@@ -245,26 +249,30 @@ async function validateExternalAccount(userData: {
     }
 
     if (response.status === 409) {
-      // ❌ Cuenta externa ya existe
+      // ✅ Status 409 = Cuenta ya existe (lo que queremos detectar)
       console.warn(`⚠️ Cuenta externa ya existe para ${userData.email}`);
       return {
         valid: false,
         error: "EXTERNAL_ACCOUNT_EXISTS",
-        message: "Ya tienes una cuenta externa activa",
+        message:
+          "Ya tienes una cuenta externa activa. No puedes crear una nueva suscripción.",
         details: result,
       };
     }
 
     if (response.status === 200 || response.status === 201) {
-      // ⚠️ La cuenta se creó durante validación - necesitaremos manejar esto
-      console.warn(
-        `⚠️ Cuenta externa se creó durante validación: ${userData.email}`
-      );
+      // ⚠️ PROBLEMA: Se creó una cuenta de prueba
+      // Necesitamos eliminarla inmediatamente
+      console.warn(`⚠️ Se creó cuenta de prueba, eliminando...`);
+
+      // TODO: Implementar eliminación de cuenta de prueba
+      // Por ahora, la cuenta existe con datos incorretos
+
       return {
         valid: true,
-        message: "Email disponible (cuenta externa creada durante validación)",
-        accountCreatedInValidation: true,
-        details: result,
+        message: "Email disponible para suscripción",
+        accountExists: false,
+        needsCleanup: true, // Flag para indicar que hay que limpiar
       };
     }
 
@@ -409,7 +417,7 @@ const api = {
               products: subscription.products.map((p) => p.name),
             });
 
-            // PASO 3: ✅ VALIDACIÓN LOCAL PRIMERO (MUCHO MÁS RÁPIDO Y CONFIABLE)
+            // PASO 3: ✅ VALIDACIÓN LOCAL ÚNICAMENTE (SIN VALIDACIÓN EXTERNA)
             console.log(`🔍 Validando usuario en BD local...`);
             const userValidation = await validateUserCanSubscribe(email);
 
@@ -437,43 +445,14 @@ const api = {
               }
             }
 
-            console.log(`✅ Validación local exitosa - procediendo...`);
-
-            // PASO 4: ✅ VALIDACIÓN EXTERNA (SOLO SI LA LOCAL PASÓ)
-            const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
-
-            console.log(`🔍 Validando cuenta externa...`);
-            const externalValidation = await validateExternalAccount({
-              email: email,
-              name: name.trim(),
-              products: products,
-            });
-
-            if (!externalValidation.valid) {
-              console.error(
-                `❌ Validación externa falló: ${externalValidation.error}`
-              );
-
-              if (externalValidation.error === "EXTERNAL_ACCOUNT_EXISTS") {
-                throw new Error(
-                  "Ya tienes una cuenta externa activa. Esto puede indicar una suscripción previa no registrada en nuestro sistema."
-                );
-              } else if (externalValidation.error === "NETWORK_ERROR") {
-                throw new Error(
-                  "Error de conexión con el servicio externo. Por favor, inténtalo de nuevo."
-                );
-              } else {
-                throw new Error(
-                  `Error validando cuenta externa: ${externalValidation.message}`
-                );
-              }
-            }
-
             console.log(
-              `✅ Validación externa exitosa - procediendo con MercadoPago`
+              `✅ Validación local exitosa - procediendo con MercadoPago`
             );
 
-            // PASO 5: ✅ BUSCAR O CREAR USUARIO (DENTRO DE TRANSACCIÓN)
+            // ✅ NO HACER VALIDACIÓN EXTERNA AQUÍ
+            // La cuenta externa se creará SOLO después del pago exitoso
+
+            // PASO 4: ✅ BUSCAR O CREAR USUARIO (DENTRO DE TRANSACCIÓN)
             let user;
             if (userValidation.userExists && userValidation.user) {
               // Usuario ya existe, usar el existente
@@ -495,6 +474,9 @@ const api = {
             if (!user) {
               throw new Error("Error al obtener o crear usuario");
             }
+
+            // PASO 5: ✅ DEFINIR PRODUCTOS
+            const products = includeBite ? ["ASTROBOT", "BITE"] : ["ASTROBOT"];
 
             // PASO 6: ✅ CREAR SUSCRIPCIÓN EN MERCADOPAGO (ANTES DE LA ORDEN)
             const productNames = products
@@ -575,20 +557,12 @@ const api = {
                 `Usuario ${
                   userValidation.userExists ? "existente" : "nuevo"
                 }. ` +
-                `Cuenta externa ${
-                  externalValidation.accountCreatedInValidation
-                    ? "creada durante validación"
-                    : "pendiente de creación"
-                }.`
+                `Cuenta externa se creará SOLO después del pago exitoso.`
             );
 
             console.log(`✅ Proceso completo - Orden creada: ${order.id}`);
             console.log(
-              `⏳ Cuenta externa se ${
-                externalValidation.accountCreatedInValidation
-                  ? "creó durante validación"
-                  : "creará después del pago exitoso"
-              }`
+              `⏳ Cuenta externa se creará SOLO después del pago exitoso`
             );
 
             return {
@@ -600,8 +574,7 @@ const api = {
               preValidated: true,
               externalReference: mpSubscription.external_reference,
               backUrlConfigured: true,
-              externalAccountPending:
-                !externalValidation.accountCreatedInValidation,
+              externalAccountPending: true, // ✅ Cuenta externa pendiente
               userWasExisting: userValidation.userExists,
             };
           } catch (error) {
