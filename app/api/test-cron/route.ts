@@ -1,62 +1,51 @@
-import { NextResponse } from "next/server";
-import api from "../../../actions/order/api";
+import { NextRequest, NextResponse } from "next/server";
+import { testSubscriptionCheck } from "../../../lib/cron";
 
 export async function GET() {
-  try {
-    console.log("🧪 TEST ENDPOINT GET - Ejecutando revisión manual...");
-
-    const results = await api.order.processExpiredSubscriptions();
-
-    return NextResponse.json({
-      success: true,
-      message: "Test GET ejecutado correctamente",
-      data: results,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("❌ Error en test endpoint GET:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Error ejecutando test GET",
-        error: error instanceof Error ? error.message : "Unknown error",
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    success: true,
+    info: {
+      environment: process.env.NODE_ENV,
+      cronType: "Vercel Cron",
+      schedule: "0 5 * * * (UTC)",
+      endpoint: "/api/cron/subscription-maintenance",
+      testEndpoint: "/api/test-cron",
+    },
+  });
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    console.log("🧪 TEST ENDPOINT POST - Ejecutando revisión manual...");
+    // Solo permitir en desarrollo o con secret
+    const isAuthorized =
+      process.env.NODE_ENV === "development" ||
+      request.headers.get("x-cron-secret") === process.env.CRON_SECRET;
 
-    const results = await api.order.processExpiredSubscriptions();
+    if (!isAuthorized) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-    const stats = await api.subscription.getStats();
-    const expiredSubscriptions = await api.order.getExpiredSubscriptions();
+    const body = await request.json();
+    const { type } = body;
 
-    return NextResponse.json({
-      success: true,
-      message: "Test POST ejecutado correctamente",
-      data: {
-        processResults: results,
-        currentStats: stats,
-        currentExpired: expiredSubscriptions,
-        expiredCount: expiredSubscriptions.length,
-      },
-      timestamp: new Date().toISOString(),
-    });
+    let result;
+
+    if (type === "vercel") {
+      // Test llamando al endpoint de Vercel Cron
+      const { testVercelCron } = await import("../../../lib/cron");
+      result = await testVercelCron();
+    } else {
+      // Test directo (tu función original)
+      result = await testSubscriptionCheck();
+    }
+
+    return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error("❌ Error en test endpoint POST:", error);
-
+    console.error("Error in test-cron API:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Error ejecutando test POST",
         error: error instanceof Error ? error.message : "Unknown error",
-        timestamp: new Date().toISOString(),
       },
       { status: 500 }
     );
