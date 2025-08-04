@@ -13,6 +13,43 @@ export const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
 });
 
+// 🆕 FUNCIÓN PARA ELIMINAR CUENTA DEL BACKEND
+async function deleteAccountFromBackend(email: string): Promise<boolean> {
+  try {
+    const backendApiKey = process.env.EXTERNAL_API_TOKEN;
+
+    if (!backendApiKey) {
+      console.error("❌ EXTERNAL_API_TOKEN no configurada");
+      return false;
+    }
+
+    const response = await fetch(
+      `https://backend.taxlight.cl/accounts/${email}`,
+      {
+        method: "DELETE",
+        headers: {
+          "X-API-Key": backendApiKey,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error(
+        `❌ Error eliminando cuenta ${email} del backend:`,
+        response.status,
+        response.statusText
+      );
+      return false;
+    }
+
+    console.log(`🗑️ Cuenta eliminada del backend: ${email}`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Error en request de eliminación para ${email}:`, error);
+    return false;
+  }
+}
+
 // Función para validar email
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1509,6 +1546,8 @@ const api = {
         let errorCount = 0;
         let skippedCount =
           baseExpiredSubscriptions.length - filteredSubscriptions.length;
+        let backendDeletionSuccessCount = 0;
+        let backendDeletionErrorCount = 0;
 
         for (const expired of filteredSubscriptions) {
           try {
@@ -1518,13 +1557,36 @@ const api = {
               } días vencida)`
             );
 
+            let backendDeleted = false;
+
             if (!dryRun) {
               // 🔥 PROCESAMIENTO REAL
+
+              // 1. Crear log y desactivar suscripción local
               await this.deactivateExpiredSubscription(expired.orderId);
+
+              // 2. Desactivar usuario local
               await api.user.deactivateUser(
                 expired.userId,
                 "Suscripción vencida"
               );
+
+              // 3. 🆕 ELIMINAR CUENTA DEL BACKEND
+              backendDeleted = await deleteAccountFromBackend(
+                expired.userEmail
+              );
+
+              if (backendDeleted) {
+                backendDeletionSuccessCount++;
+                console.log(
+                  `🗑️ ${expired.userEmail} - Cuenta eliminada del backend`
+                );
+              } else {
+                backendDeletionErrorCount++;
+                console.error(
+                  `⚠️ ${expired.userEmail} - Error eliminando del backend (cuenta local ya desactivada)`
+                );
+              }
             }
 
             processedResults.push({
@@ -1535,6 +1597,7 @@ const api = {
               daysExpired: expired.daysExpired,
               status: dryRun ? "would_process" : "processed",
               action: dryRun ? "simulation" : "deactivated",
+              backendDeleted: dryRun ? "would_delete" : backendDeleted,
             });
 
             successCount++;
@@ -1554,6 +1617,7 @@ const api = {
               status: "error",
               action: "failed",
               error: error instanceof Error ? error.message : "Unknown error",
+              backendDeleted: false,
             });
 
             errorCount++;
@@ -1567,6 +1631,11 @@ const api = {
           skipped: skippedCount,
           processed: successCount,
           errors: errorCount,
+          backendDeletions: {
+            successful: backendDeletionSuccessCount,
+            failed: backendDeletionErrorCount,
+            total: backendDeletionSuccessCount + backendDeletionErrorCount,
+          },
           results: processedResults,
           filters: {
             testUsersOnly,
@@ -1593,6 +1662,7 @@ const api = {
             skipped: summary.skipped,
             processed: summary.processed,
             errors: summary.errors,
+            backendDeletions: summary.backendDeletions,
           }
         );
 
