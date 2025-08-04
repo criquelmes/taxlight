@@ -34,16 +34,10 @@ export async function POST(request: NextRequest) {
     const isProduction = process.env.NODE_ENV === "production";
 
     // En producción, por defecto es dry run, EXCEPTO si se fuerza lo contrario
-    const isDryRun = isProduction
-      ? dryRunHeader === "false" && forceRealHeader === "true"
-        ? false
-        : true // En prod: dry run por defecto
-      : dryRunHeader !== "false"; // En dev: respeta el header
+    const isDryRun = isProduction ? false : dryRunHeader !== "false"; // En dev: respeta el header
 
     // En producción, por defecto solo usuarios de prueba
-    const testUsersOnly = isProduction
-      ? testUsersOnlyHeader !== "false" // En prod: test users por defecto
-      : testUsersOnlyHeader === "true"; // En dev: respeta el header
+    const testUsersOnly = isProduction ? false : testUsersOnlyHeader === "true"; // En dev: respeta el header
 
     const specificEmail = specificEmailHeader || null;
 
