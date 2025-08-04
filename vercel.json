@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/subscription-maintenance",
-      "schedule": "50 12 * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }
