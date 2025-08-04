@@ -1372,7 +1372,7 @@ const api = {
       }
     },
 
-    async processExpiredSubscriptions() {
+    async processExpiredSubscriptions(dryRun: boolean = false) {
       try {
         const expiredSubscriptions = await this.getExpiredSubscriptions();
         const processedResults = [];
@@ -1428,6 +1428,177 @@ const api = {
         return summary;
       } catch (error) {
         console.error("❌ Error processing expired subscriptions:", error);
+        throw error;
+      }
+    },
+    // 🆕 AQUÍ AGREGAR LA NUEVA FUNCIÓN FILTRADA
+    async processExpiredSubscriptionsFiltered(options: {
+      dryRun?: boolean;
+      testUsersOnly?: boolean;
+      specificEmail?: string | null;
+      maxProcessCount?: number;
+    }) {
+      try {
+        const {
+          dryRun = false,
+          testUsersOnly = false,
+          specificEmail = null,
+          maxProcessCount = 10,
+        } = options;
+
+        console.log(
+          `🔍 Procesando suscripciones vencidas con filtros:`,
+          options
+        );
+
+        // 1. Obtener suscripciones vencidas base
+        const baseExpiredSubscriptions = await this.getExpiredSubscriptions();
+
+        console.log(
+          `📊 Suscripciones vencidas totales encontradas: ${baseExpiredSubscriptions.length}`
+        );
+
+        // 2. 🆕 APLICAR FILTROS DE SEGURIDAD
+        let filteredSubscriptions = baseExpiredSubscriptions;
+
+        // Filtro 1: Solo usuarios de prueba
+        if (testUsersOnly) {
+          const testEmailPatterns = [
+            /test.*@/i, // test@, testing@, test-user@
+            /@ejemplo\./i, // @ejemplo.com, @ejemplo.cl
+            /@test\./i, // @test.com, @test.local
+            /demo.*@/i, // demo@, demo-user@
+            /@.*\.test$/i, // cualquier@dominio.test
+            /prueba.*@/i, // prueba@, pruebas@
+          ];
+
+          filteredSubscriptions = filteredSubscriptions.filter((sub) =>
+            testEmailPatterns.some((pattern) => pattern.test(sub.userEmail))
+          );
+
+          console.log(
+            `🧪 Filtro de usuarios de prueba aplicado: ${filteredSubscriptions.length} restantes`
+          );
+        }
+
+        // Filtro 2: Email específico
+        if (specificEmail) {
+          filteredSubscriptions = filteredSubscriptions.filter(
+            (sub) => sub.userEmail.toLowerCase() === specificEmail.toLowerCase()
+          );
+
+          console.log(
+            `🎯 Filtro de email específico aplicado: ${filteredSubscriptions.length} restantes`
+          );
+        }
+
+        // Filtro 3: Límite máximo de procesamiento
+        if (filteredSubscriptions.length > maxProcessCount) {
+          console.log(
+            `⚠️ Aplicando límite de seguridad: ${maxProcessCount} de ${filteredSubscriptions.length}`
+          );
+          filteredSubscriptions = filteredSubscriptions.slice(
+            0,
+            maxProcessCount
+          );
+        }
+
+        // 3. Procesar las suscripciones filtradas
+        const processedResults = [];
+        let successCount = 0;
+        let errorCount = 0;
+        let skippedCount =
+          baseExpiredSubscriptions.length - filteredSubscriptions.length;
+
+        for (const expired of filteredSubscriptions) {
+          try {
+            console.log(
+              `${dryRun ? "🧪" : "🔄"} Procesando: ${expired.userEmail} (${
+                expired.daysExpired
+              } días vencida)`
+            );
+
+            if (!dryRun) {
+              // 🔥 PROCESAMIENTO REAL
+              await this.deactivateExpiredSubscription(expired.orderId);
+              await api.user.deactivateUser(
+                expired.userId,
+                "Suscripción vencida"
+              );
+            }
+
+            processedResults.push({
+              orderId: expired.orderId,
+              userEmail: expired.userEmail,
+              subscriptionName: expired.subscriptionName,
+              products: expired.products,
+              daysExpired: expired.daysExpired,
+              status: dryRun ? "would_process" : "processed",
+              action: dryRun ? "simulation" : "deactivated",
+            });
+
+            successCount++;
+
+            console.log(
+              `${dryRun ? "🧪" : "✅"} ${expired.userEmail} - ${
+                dryRun ? "Simulated" : "Processed"
+              }`
+            );
+          } catch (error) {
+            console.error(`❌ Error procesando ${expired.userEmail}:`, error);
+
+            processedResults.push({
+              orderId: expired.orderId,
+              userEmail: expired.userEmail,
+              subscriptionName: expired.subscriptionName,
+              status: "error",
+              action: "failed",
+              error: error instanceof Error ? error.message : "Unknown error",
+            });
+
+            errorCount++;
+          }
+        }
+
+        // 4. Resumen de resultados
+        const summary = {
+          totalExpired: baseExpiredSubscriptions.length,
+          filtered: filteredSubscriptions.length,
+          skipped: skippedCount,
+          processed: successCount,
+          errors: errorCount,
+          results: processedResults,
+          filters: {
+            testUsersOnly,
+            specificEmail,
+            maxProcessCount,
+            appliedFilters: [
+              testUsersOnly && "test-users-only",
+              specificEmail && `specific-email: ${specificEmail}`,
+              filteredSubscriptions.length !==
+                baseExpiredSubscriptions.length && "count-limited",
+            ].filter(Boolean),
+          },
+          dryRun,
+          executedAt: new Date().toISOString(),
+        };
+
+        console.log(
+          `📊 Procesamiento ${
+            dryRun ? "(DRY RUN) " : ""
+          }completado con filtros:`,
+          {
+            totalFound: summary.totalExpired,
+            filtered: summary.filtered,
+            skipped: summary.skipped,
+            processed: summary.processed,
+            errors: summary.errors,
+          }
+        );
+
+        return summary;
+      } catch (error) {
+        console.error("❌ Error en procesamiento filtrado:", error);
         throw error;
       }
     },
