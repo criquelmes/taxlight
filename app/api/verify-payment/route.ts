@@ -73,20 +73,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calcular detalles del plan
-    const planType = plan || "monthly";
-    const includesBite = bite === true || bite === "true";
+    // Calcular detalles del plan con prioridad para parámetros explícitos
+    let finalPlanType = plan || "annual"; // Default a annual para preapprovals
+    let finalIncludesBite = bite === true || bite === "true";
 
-    // Para preapprovals, intentar inferir desde el contexto si no hay parámetros explícitos
-    let finalPlanType = planType;
-    let finalIncludesBite = includesBite;
-
-    // Si es un preapproval sin información explícita, usar lógica de inferencia
+    // Para preapprovals sin parámetros explícitos, usar lógica de inferencia
     if (preapprovalId && !plan && bite === undefined) {
-      // Asumir anual (la mayoría de preapprovals son anuales)
-      finalPlanType = "annual";
-      // No asumir Bite por defecto, será detectado por el monto
-      finalIncludesBite = false;
+      // ✅ MEJORA: Los parámetros del backend ahora deberían estar presentes
+      // pero si no están, usar fallback inteligente
+      finalPlanType = "annual"; // La mayoría son anuales
+      finalIncludesBite = true; // Asumir que incluye Bite por defecto
+
+      console.log(
+        "🔍 Usando inferencia para preapproval sin parámetros explícitos"
+      );
     }
 
     const planDetails = calculatePlanDetails(finalPlanType, finalIncludesBite);
@@ -126,9 +126,20 @@ export async function POST(request: NextRequest) {
             if (statusResult.status === "approved") {
               orderData = matchingOrder;
 
-              // Intentar detectar el plan real desde la orden o el monto
-              const detectedPlanDetails =
-                detectPlanFromOrder(matchingOrder) || planDetails;
+              // ✅ PRIORIDAD: Usar parámetros de URL si están disponibles
+              let detectedPlanDetails;
+              if (plan || bite !== undefined) {
+                console.log("🎯 Usando parámetros explícitos de URL");
+                detectedPlanDetails = calculatePlanDetails(
+                  finalPlanType,
+                  finalIncludesBite
+                );
+              } else {
+                // Fallback: detectar desde la orden
+                console.log("🔍 Detectando plan desde la orden en BD");
+                detectedPlanDetails =
+                  detectPlanFromOrder(matchingOrder) || planDetails;
+              }
 
               return NextResponse.json({
                 success: true,
@@ -184,7 +195,7 @@ export async function POST(request: NextRequest) {
           planName: planDetails.name,
           amount: planDetails.formattedAmount,
           transactionId: primaryPaymentId || merchantOrderId || "N/A",
-          nextBilling: getNextBillingDate(planType === "annual"),
+          nextBilling: getNextBillingDate(finalPlanType === "annual"),
           products: planDetails.products,
           status: primaryStatus || "approved",
           verified: false,
@@ -228,7 +239,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Función para detectar plan desde la orden
+// ✅ FUNCIÓN MEJORADA - Detectar plan desde la orden
 function detectPlanFromOrder(order: any) {
   if (!order) return null;
 
@@ -237,75 +248,115 @@ function detectPlanFromOrder(order: any) {
     if (order.orderSubscriptions && order.orderSubscriptions.length > 0) {
       const subscription = order.orderSubscriptions[0].subscription;
 
-      // Detectar productos
+      // Detectar productos para determinar si incluye Bite
       const products = subscription.products?.map((p: any) => p.name) || [];
       const includesBite = products.some((p: string) =>
         p.toLowerCase().includes("bite")
       );
 
-      // Detectar tipo de plan desde la frecuencia o el monto
+      // Detectar tipo de plan desde múltiples fuentes
       let planType = "monthly";
       if (
         subscription.frequency === 12 ||
+        subscription.name?.includes("annual") ||
         subscription.name?.includes("Anual") ||
         subscription.type === "YEARLY"
       ) {
         planType = "annual";
       }
 
+      console.log(
+        `🔍 Plan detectado desde orden: ${planType}, Bite: ${includesBite}`
+      );
       return calculatePlanDetails(planType, includesBite);
     }
 
     // Si no hay información de suscripción, intentar desde el monto total
-    if (order.totalAmount) {
-      const amount = order.totalAmount;
+    if (order.totalAmount || order.total) {
+      const amount = order.totalAmount || order.total;
+
+      console.log(`🔍 Detectando plan desde monto: ${amount}`);
 
       // Detectar el plan basado en el monto (Bite no afecta el precio)
       if (amount === 85000) {
-        // Plan anual - necesitamos detectar si incluye Bite desde otros campos
+        // Plan anual - detectar Bite desde otros campos
         const includesBite = detectBiteFromOrder(order);
+        console.log(`🎯 Plan anual detectado, Bite: ${includesBite}`);
         return calculatePlanDetails("annual", includesBite);
       } else if (amount === 10000) {
-        // Plan mensual - necesitamos detectar si incluye Bite desde otros campos
+        // Plan mensual - detectar Bite desde otros campos
         const includesBite = detectBiteFromOrder(order);
+        console.log(`🎯 Plan mensual detectado, Bite: ${includesBite}`);
         return calculatePlanDetails("monthly", includesBite);
       }
     }
 
+    console.log("⚠️ No se pudo detectar plan desde la orden");
     return null;
   } catch (error) {
-    console.error("Error detectando plan desde orden:", error);
+    console.error("❌ Error detectando plan desde orden:", error);
     return null;
   }
 }
 
-// Función auxiliar para detectar Bite desde la orden
+// ✅ FUNCIÓN MEJORADA - Detectar Bite desde múltiples fuentes
 function detectBiteFromOrder(order: any): boolean {
-  // Buscar en diferentes lugares donde podría estar la información de Bite
-  if (order.notes && order.notes.toLowerCase().includes("bite")) {
-    return true;
-  }
+  try {
+    // 1. Buscar en notes de la orden
+    if (order.notes && order.notes.toLowerCase().includes("bite")) {
+      console.log("🎯 Bite detectado en notes de la orden");
+      return true;
+    }
 
-  if (order.description && order.description.toLowerCase().includes("bite")) {
-    return true;
-  }
+    // 2. Buscar en description
+    if (order.description && order.description.toLowerCase().includes("bite")) {
+      console.log("🎯 Bite detectado en description");
+      return true;
+    }
 
-  // Buscar en productos de la orden
-  if (order.orderSubscriptions) {
-    for (const orderSub of order.orderSubscriptions) {
-      if (orderSub.subscription?.products) {
-        const hasBite = orderSub.subscription.products.some((p: any) =>
-          p.name.toLowerCase().includes("bite")
-        );
-        if (hasBite) return true;
+    // 3. Buscar en transactionId (formato: subscriptionType-bite|astro-...)
+    if (order.transactionId) {
+      const transactionParts = order.transactionId.split("-");
+      if (transactionParts.length > 1 && transactionParts[1] === "bite") {
+        console.log("🎯 Bite detectado en transactionId");
+        return true;
       }
     }
-  }
 
-  return false;
+    // 4. Buscar en productos de la suscripción
+    if (order.orderSubscriptions) {
+      for (const orderSub of order.orderSubscriptions) {
+        if (orderSub.subscription?.products) {
+          const hasBite = orderSub.subscription.products.some((p: any) =>
+            p.name.toLowerCase().includes("bite")
+          );
+          if (hasBite) {
+            console.log("🎯 Bite detectado en productos de suscripción");
+            return true;
+          }
+        }
+      }
+    }
+
+    // 5. Buscar en el reason del preapproval (si está disponible)
+    if (
+      order.mpSubscriptionReason &&
+      order.mpSubscriptionReason.toLowerCase().includes("bite")
+    ) {
+      console.log("🎯 Bite detectado en mpSubscriptionReason");
+      return true;
+    }
+
+    console.log("ℹ️ Bite no detectado en la orden");
+    return false;
+  } catch (error) {
+    console.error("❌ Error detectando Bite:", error);
+    return false;
+  }
 }
+
+// Función helper para extraer método de pago del resultado
 function getPaymentMethodFromResult(statusResult: any): string | undefined {
-  // Intentar obtener el método de pago de diferentes lugares posibles
   if (statusResult.paymentMethod) {
     return statusResult.paymentMethod;
   }
@@ -314,7 +365,6 @@ function getPaymentMethodFromResult(statusResult: any): string | undefined {
     return statusResult.order.paymentMethod;
   }
 
-  // Si no hay método específico, retornar undefined para usar el fallback
   return undefined;
 }
 
@@ -323,7 +373,6 @@ function getEmailFromResult(
   statusResult: any,
   matchingOrder: any
 ): string | undefined {
-  // Intentar obtener el email de diferentes lugares
   if (statusResult.email) {
     return statusResult.email;
   }
@@ -336,7 +385,6 @@ function getEmailFromResult(
     return matchingOrder.user.email;
   }
 
-  // Si no hay email disponible, retornar undefined
   return undefined;
 }
 
@@ -373,23 +421,33 @@ function findMatchingOrder(
   } = criteria;
 
   return orders.find((order) => {
-    // Buscar por preapprovalId (suscripciones)
-    if (
-      preapprovalId &&
-      (order.mpSubscriptionId === preapprovalId ||
+    // Buscar por preapprovalId (suscripciones) - PRIORIDAD ALTA
+    if (preapprovalId) {
+      if (
+        order.mpSubscriptionId === preapprovalId ||
         order.transactionId === preapprovalId ||
-        order.id === preapprovalId)
-    ) {
-      return true;
+        order.id === preapprovalId
+      ) {
+        console.log(`✅ Orden encontrada por preapprovalId: ${order.id}`);
+        return true;
+      }
     }
 
     // Buscar por mpSubscriptionId
     if (paymentId && order.mpSubscriptionId === paymentId) {
+      console.log(`✅ Orden encontrada por mpSubscriptionId: ${order.id}`);
       return true;
     }
 
     // Buscar por transactionId que contenga el paymentId
     if (paymentId && order.transactionId?.includes(paymentId)) {
+      console.log(`✅ Orden encontrada por transactionId: ${order.id}`);
+      return true;
+    }
+
+    // Buscar por external reference (ID de la orden)
+    if (externalReference && order.id === externalReference) {
+      console.log(`✅ Orden encontrada por externalReference: ${order.id}`);
       return true;
     }
 
@@ -399,6 +457,7 @@ function findMatchingOrder(
       (order.merchantOrderId === merchantOrderId ||
         order.transactionId?.includes(merchantOrderId))
     ) {
+      console.log(`✅ Orden encontrada por merchantOrderId: ${order.id}`);
       return true;
     }
 
@@ -408,11 +467,7 @@ function findMatchingOrder(
       (order.preferenceId === preferenceId ||
         order.mpSubscriptionId === preferenceId)
     ) {
-      return true;
-    }
-
-    // Buscar por external reference (ID de la orden)
-    if (externalReference && order.id === externalReference) {
+      console.log(`✅ Orden encontrada por preferenceId: ${order.id}`);
       return true;
     }
 
@@ -424,9 +479,9 @@ function findMatchingOrder(
 function calculatePlanDetails(planType: string, includesBite: boolean) {
   // Precios fijos según tu base de datos - Bite NO afecta el precio
   const planPrices = {
-    annual: 85000, // Precio fijo para plan anual
-    monthly: 10000, // Precio fijo para plan mensual
-    mensual: 10000, // Precio fijo para plan mensual
+    annual: 85000,
+    monthly: 10000,
+    mensual: 10000,
   };
 
   const totalPrice =
@@ -452,7 +507,7 @@ function calculatePlanDetails(planType: string, includesBite: boolean) {
   };
 }
 
-// Función mejorada para calcular próxima fecha de facturación
+// Función para calcular próxima fecha de facturación
 function getNextBillingDate(isAnnual: boolean): string {
   const today = new Date();
 
