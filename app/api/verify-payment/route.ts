@@ -75,8 +75,21 @@ export async function POST(request: NextRequest) {
 
     // Calcular detalles del plan
     const planType = plan || "monthly";
-    const includesBite = bite === true || bite === "true" || bite === true;
-    const planDetails = calculatePlanDetails(planType, includesBite);
+    const includesBite = bite === true || bite === "true";
+
+    // Para preapprovals, intentar inferir desde el contexto si no hay parámetros explícitos
+    let finalPlanType = planType;
+    let finalIncludesBite = includesBite;
+
+    // Si es un preapproval sin información explícita, usar lógica de inferencia
+    if (preapprovalId && !plan && bite === undefined) {
+      // Asumir anual (la mayoría de preapprovals son anuales)
+      finalPlanType = "annual";
+      // No asumir Bite por defecto, será detectado por el monto
+      finalIncludesBite = false;
+    }
+
+    const planDetails = calculatePlanDetails(finalPlanType, finalIncludesBite);
 
     let orderData = null;
     let verificationError = null;
@@ -113,15 +126,21 @@ export async function POST(request: NextRequest) {
             if (statusResult.status === "approved") {
               orderData = matchingOrder;
 
+              // Intentar detectar el plan real desde la orden o el monto
+              const detectedPlanDetails =
+                detectPlanFromOrder(matchingOrder) || planDetails;
+
               return NextResponse.json({
                 success: true,
                 details: {
                   orderId: matchingOrder.id,
-                  planName: planDetails.name,
-                  amount: planDetails.formattedAmount,
+                  planName: detectedPlanDetails.name,
+                  amount: detectedPlanDetails.formattedAmount,
                   transactionId: primaryPaymentId,
-                  nextBilling: getNextBillingDate(planType === "annual"),
-                  products: planDetails.products,
+                  nextBilling: getNextBillingDate(
+                    detectedPlanDetails.name.includes("Anual")
+                  ),
+                  products: detectedPlanDetails.products,
                   status: "approved",
                   paymentMethod:
                     getPaymentMethodFromResult(statusResult) || "mercadopago",
@@ -209,7 +228,82 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Función helper para extraer método de pago del resultado
+// Función para detectar plan desde la orden
+function detectPlanFromOrder(order: any) {
+  if (!order) return null;
+
+  try {
+    // Si la orden tiene información de suscripciones
+    if (order.orderSubscriptions && order.orderSubscriptions.length > 0) {
+      const subscription = order.orderSubscriptions[0].subscription;
+
+      // Detectar productos
+      const products = subscription.products?.map((p: any) => p.name) || [];
+      const includesBite = products.some((p: string) =>
+        p.toLowerCase().includes("bite")
+      );
+
+      // Detectar tipo de plan desde la frecuencia o el monto
+      let planType = "monthly";
+      if (
+        subscription.frequency === 12 ||
+        subscription.name?.includes("Anual") ||
+        subscription.type === "YEARLY"
+      ) {
+        planType = "annual";
+      }
+
+      return calculatePlanDetails(planType, includesBite);
+    }
+
+    // Si no hay información de suscripción, intentar desde el monto total
+    if (order.totalAmount) {
+      const amount = order.totalAmount;
+
+      // Detectar el plan basado en el monto (Bite no afecta el precio)
+      if (amount === 85000) {
+        // Plan anual - necesitamos detectar si incluye Bite desde otros campos
+        const includesBite = detectBiteFromOrder(order);
+        return calculatePlanDetails("annual", includesBite);
+      } else if (amount === 10000) {
+        // Plan mensual - necesitamos detectar si incluye Bite desde otros campos
+        const includesBite = detectBiteFromOrder(order);
+        return calculatePlanDetails("monthly", includesBite);
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error detectando plan desde orden:", error);
+    return null;
+  }
+}
+
+// Función auxiliar para detectar Bite desde la orden
+function detectBiteFromOrder(order: any): boolean {
+  // Buscar en diferentes lugares donde podría estar la información de Bite
+  if (order.notes && order.notes.toLowerCase().includes("bite")) {
+    return true;
+  }
+
+  if (order.description && order.description.toLowerCase().includes("bite")) {
+    return true;
+  }
+
+  // Buscar en productos de la orden
+  if (order.orderSubscriptions) {
+    for (const orderSub of order.orderSubscriptions) {
+      if (orderSub.subscription?.products) {
+        const hasBite = orderSub.subscription.products.some((p: any) =>
+          p.name.toLowerCase().includes("bite")
+        );
+        if (hasBite) return true;
+      }
+    }
+  }
+
+  return false;
+}
 function getPaymentMethodFromResult(statusResult: any): string | undefined {
   // Intentar obtener el método de pago de diferentes lugares posibles
   if (statusResult.paymentMethod) {
@@ -328,16 +422,15 @@ function findMatchingOrder(
 
 // Función para calcular detalles del plan
 function calculatePlanDetails(planType: string, includesBite: boolean) {
+  // Precios fijos según tu base de datos - Bite NO afecta el precio
   const planPrices = {
-    annual: 85000,
-    monthly: 10000,
-    mensual: 10000,
+    annual: 85000, // Precio fijo para plan anual
+    monthly: 10000, // Precio fijo para plan mensual
+    mensual: 10000, // Precio fijo para plan mensual
   };
 
-  const bitePrice = 5000; // Precio del addon Bite
-  const basePrice =
+  const totalPrice =
     planPrices[planType as keyof typeof planPrices] || planPrices.monthly;
-  const totalPrice = basePrice + (includesBite ? bitePrice : 0);
 
   const planNames = {
     annual: "Plan Anual",
@@ -354,8 +447,8 @@ function calculatePlanDetails(planType: string, includesBite: boolean) {
     amount: totalPrice,
     formattedAmount: totalPrice.toLocaleString("es-CL"),
     products: includesBite ? ["Astrobot", "Bite"] : ["Astrobot"],
-    basePrice,
-    bitePrice: includesBite ? bitePrice : 0,
+    basePrice: totalPrice,
+    bitePrice: 0, // Bite no añade costo adicional
   };
 }
 

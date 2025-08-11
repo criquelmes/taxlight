@@ -25,13 +25,12 @@ function inferPlanFromPreapproval(
 ) {
   if (!preapprovalId) return null;
 
-  // En caso de suscripciones, el external_reference puede contener información del plan
-  // o podemos inferir desde el preapprovalId pattern si tienes alguno
-
-  // Por ahora, retornar valores por defecto que se pueden ajustar
+  // Para preapprovals, necesitamos verificar el monto real con el backend
+  // Por ahora, asumir que es anual pero SIN Bite hasta que se verifique el monto real
   return {
-    planType: "annual", // La mayoría de preapprovals son anuales
-    includesBite: true, // Inferir si incluye Bite (puedes ajustar esta lógica)
+    planType: "annual",
+    includesBite: false, // Cambiar a false por defecto, se corregirá con el backend
+    needsVerification: true, // Flag para indicar que necesita verificación
   };
 }
 
@@ -58,24 +57,21 @@ function createFallbackDetails(
     return includesBite ? `${baseName} + Bite` : baseName;
   };
 
-  // Función auxiliar para obtener monto del plan
-  const getPlanAmount = (planType: string, includesBite: boolean) => {
-    const baseAmounts = {
-      annual: 85000,
-      monthly: 10000,
-      mensual: 10000,
+  // Función auxiliar para obtener monto del plan (Bite NO afecta el precio)
+  const getPlanAmount = (planType: string) => {
+    const planPrices = {
+      annual: 85000, // Precio fijo para anual
+      monthly: 10000, // Precio fijo para mensual
+      mensual: 10000, // Precio fijo para mensual
     };
 
-    const baseAmount =
-      baseAmounts[planType as keyof typeof baseAmounts] || 10000;
-    const biteAmount = includesBite ? 5000 : 0;
-
-    return (baseAmount + biteAmount).toLocaleString("es-CL");
+    const amount = planPrices[planType as keyof typeof planPrices] || 10000;
+    return amount.toLocaleString("es-CL");
   };
 
   return {
     planName: getPlanDisplayName(planType, includesBite),
-    amount: getPlanAmount(planType, includesBite),
+    amount: getPlanAmount(planType), // Solo depende del tipo de plan
     products: includesBite ? ["Astrobot", "Bite"] : ["Astrobot"],
     transactionId: paymentId || collectionId || preapprovalId || "N/A",
     status: "approved",
@@ -130,19 +126,18 @@ function PaymentSuccessContent() {
     return includesBite ? `${baseName} + Bite` : baseName;
   };
 
-  // Función para obtener el monto según el plan
+  // Función para obtener el monto según el plan (Bite NO afecta el precio)
   const getPlanAmount = (planType: string | null, includesBite: boolean) => {
     const baseAmounts = {
-      annual: 85000,
-      monthly: 10000,
-      mensual: 10000,
+      annual: 85000, // Precio fijo
+      monthly: 10000, // Precio fijo
+      mensual: 10000, // Precio fijo
     };
 
-    const baseAmount =
-      baseAmounts[planType as keyof typeof baseAmounts] || 10000;
-    const biteAmount = includesBite ? 5000 : 0; // Asume que Bite cuesta 5000 extra
+    const amount = baseAmounts[planType as keyof typeof baseAmounts] || 10000;
+    // Bite NO afecta el precio, solo indica qué productos activar externamente
 
-    return (baseAmount + biteAmount).toLocaleString("es-CL");
+    return amount.toLocaleString("es-CL");
   };
 
   // Función para determinar si el pago fue exitoso
@@ -225,8 +220,20 @@ function PaymentSuccessContent() {
         } else {
           // Si el backend no puede verificar, usar información de fallback
           console.warn("Backend verification failed, using fallback data");
+
+          // Para preapprovals, necesitamos ser más cuidadosos con los montos
+          let fallbackPlanType = planType;
+          let fallbackIncludesBite = includesBite;
+
+          // Si es un preapproval sin información clara del plan, inferir desde el contexto
+          if (preapprovalId && !plan && !bite) {
+            // Asumir anual sin Bite por defecto para preapprovals
+            fallbackPlanType = "annual";
+            fallbackIncludesBite = false;
+          }
+
           const fallbackDetails = createFallbackDetails(
-            { planType, includesBite },
+            { planType: fallbackPlanType, includesBite: fallbackIncludesBite },
             paymentId,
             collectionId,
             preapprovalId
@@ -247,11 +254,17 @@ function PaymentSuccessContent() {
             preapprovalId,
             externalReference
           );
-          const planType = inferredPlanDetails?.planType || plan || "annual";
-          const includesBite = inferredPlanDetails?.includesBite || bite;
+
+          // Para preapprovals, ser conservadores con el monto hasta verificar
+          let fallbackPlanType = "annual";
+          let fallbackIncludesBite = false;
+
+          // Si tenemos parámetros explícitos, usarlos
+          if (plan) fallbackPlanType = plan;
+          if (bite !== undefined) fallbackIncludesBite = bite;
 
           const fallbackDetails = createFallbackDetails(
-            { planType, includesBite },
+            { planType: fallbackPlanType, includesBite: fallbackIncludesBite },
             paymentId,
             collectionId,
             preapprovalId
@@ -472,10 +485,10 @@ function PaymentSuccessContent() {
 
         <div className="action-buttons">
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("http://astrobot.taxlight.cl")}
             className="btn-primary"
           >
-            Ir al Dashboard
+            Ir a Astrobot
           </button>
           <button onClick={() => router.push("/")} className="btn-secondary">
             Volver al inicio
@@ -515,14 +528,6 @@ function PaymentSuccessContent() {
             : "none"};
         }
 
-        .result-card.error {
-          border-left: 4px solid #ef4444;
-        }
-
-        .result-card.success {
-          border-left: 4px solid #10b981;
-        }
-
         .result-icon {
           margin-bottom: 1.5rem;
           display: flex;
@@ -530,14 +535,14 @@ function PaymentSuccessContent() {
         }
 
         h1 {
-          font-size: 2.5rem;
+          font-size: 3rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
         }
 
         .subtitle {
-          font-size: 1.5rem;
+          font-size: 1.75rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           margin-bottom: 2rem;
         }
@@ -548,7 +553,7 @@ function PaymentSuccessContent() {
           border-radius: 8px;
           padding: 1rem;
           margin-bottom: 1.5rem;
-          font-size: 1rem;
+          font-size: 1.125rem;
           color: ${theme === "dark" ? "#fbbf24" : "#d97706"};
         }
 
@@ -564,7 +569,7 @@ function PaymentSuccessContent() {
 
         .payment-summary h3 {
           margin: 0 0 1.5rem 0;
-          font-size: 1.25rem;
+          font-size: 1.75rem;
           font-weight: 600;
           color: ${theme === "dark" ? "white" : "#1f2937"};
           text-align: center;
@@ -574,7 +579,7 @@ function PaymentSuccessContent() {
           display: flex;
           justify-content: space-between;
           margin-bottom: 0.75rem;
-          font-size: 1rem;
+          font-size: 1.25rem;
           padding: 0.5rem 0;
         }
 
@@ -605,18 +610,18 @@ function PaymentSuccessContent() {
 
         .transaction-id {
           font-family: monospace;
-          font-size: 0.875rem;
+          font-size: 1.125rem;
           background: ${theme === "dark" ? "rgba(255,255,255,0.1)" : "#e5e7eb"};
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
+          padding: 0.375rem 0.75rem;
+          border-radius: 6px;
         }
 
         .status-badge {
           background: #10b981;
           color: white;
-          padding: 0.25rem 0.75rem;
+          padding: 0.375rem 1rem;
           border-radius: 20px;
-          font-size: 0.875rem;
+          font-size: 1.125rem;
           font-weight: 600;
         }
 
@@ -635,7 +640,7 @@ function PaymentSuccessContent() {
           padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1rem;
+          font-size: 1.25rem;
           cursor: pointer;
           transition: all 0.2s;
           min-width: 140px;
@@ -653,7 +658,7 @@ function PaymentSuccessContent() {
           padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1rem;
+          font-size: 1.25rem;
           cursor: pointer;
           transition: all 0.2s;
           min-width: 140px;
@@ -672,13 +677,13 @@ function PaymentSuccessContent() {
         }
 
         .footer-text {
-          font-size: 1rem;
+          font-size: 1.25rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           margin: 0.5rem 0;
         }
 
         .footer-text.small {
-          font-size: 0.875rem;
+          font-size: 1rem;
           opacity: 0.8;
         }
 
@@ -689,6 +694,7 @@ function PaymentSuccessContent() {
           gap: 1rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
           padding: 2rem;
+          font-size: 1.125rem;
         }
 
         .spinner {
@@ -715,11 +721,29 @@ function PaymentSuccessContent() {
           }
 
           h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
           }
 
           .subtitle {
+            font-size: 1.5rem;
+          }
+
+          .detail-row {
+            font-size: 1.125rem;
+          }
+
+          .detail-row.highlight {
             font-size: 1.25rem;
+          }
+
+          .payment-summary h3 {
+            font-size: 2.5rem;
+          }
+
+          .btn-primary,
+          .btn-secondary {
+            font-size: 1.125rem;
+            padding: 1rem 2rem;
           }
 
           .action-buttons {
@@ -774,7 +798,7 @@ function PaymentSuccessLoading() {
 
         p {
           color: #6b7280;
-          font-size: 1rem;
+          font-size: 1.125rem;
           margin: 0;
         }
       `}</style>
