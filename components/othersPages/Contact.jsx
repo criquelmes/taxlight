@@ -38,12 +38,28 @@ export default function Contact() {
 
     // Obtener datos del formulario
     const formData = new FormData(formRef.current);
+
+    // Generar fecha y hora actual en formato personalizado
+    const now = new Date();
+    const chileTime = new Date(
+      now.toLocaleString("en-US", { timeZone: "America/Santiago" })
+    );
+
+    const day = chileTime.getDate().toString().padStart(2, "0");
+    const month = (chileTime.getMonth() + 1).toString().padStart(2, "0"); // getMonth() es 0-indexado
+    const year = chileTime.getFullYear();
+    const hours = chileTime.getHours().toString().padStart(2, "0");
+    const minutes = chileTime.getMinutes().toString().padStart(2, "0");
+
+    const timeString = `${day}-${month}-${year} a las ${hours}:${minutes}`;
+
     const baseParams = {
       name: formData.get("name"),
       phone: formData.get("phone"),
       email: formData.get("email"),
       subject: formData.get("subject"),
       message: formData.get("message"),
+      time: timeString,
     };
 
     // Enviar a cada destinatario
@@ -134,11 +150,6 @@ export default function Contact() {
                             contacto@grupowolf.cl
                           </a>
                         </p>
-                        {/* <p>
-                          <a href="mailto:ccriquelmes@gmail.com">
-                            ccriquelmes@gmail.com
-                          </a>
-                        </p> */}
                       </div>
                     </div>
                   </div>
