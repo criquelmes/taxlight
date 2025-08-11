@@ -9,12 +9,7 @@ interface Message {
   createdAt: Date;
 }
 
-// ✅ SOLUCIÓN TEMPORAL: Permitir build con token incorrecto
 const rawToken = process.env.MP_ACCESS_TOKEN!;
-
-console.log("🔧 Limpiando token de MercadoPago...");
-console.log("Token original length:", rawToken.length);
-console.log("🔍 DEBUG - Token recibido:", JSON.stringify(rawToken));
 
 // Limpiar caracteres invisibles y espacios
 const cleanToken = rawToken
@@ -24,33 +19,6 @@ const cleanToken = rawToken
     return code >= 33 && code <= 126;
   })
   .join("");
-
-console.log("Token limpio length:", cleanToken.length);
-
-// Validar que el token tenga el formato correcto
-if (!/^APP_USR-\d+-\d+-[a-f0-9]+-\d+$/.test(cleanToken)) {
-  console.error("❌ Token de MercadoPago tiene formato inválido:", cleanToken);
-  throw new Error("Invalid MercadoPago token format");
-}
-
-// ✅ CAMBIO TEMPORAL: Solo validar longitud mínima, no exacta
-if (cleanToken.length < 70) {
-  console.error(`❌ Token demasiado corto: ${cleanToken.length}, mínimo: 70`);
-  throw new Error(`Token too short: ${cleanToken.length}`);
-} else if (cleanToken.length !== 87) {
-  console.warn(
-    `⚠️ Token length incorrecto: ${cleanToken.length}, esperado: 87`
-  );
-  console.warn(
-    "⚠️ Continuando con token de longitud incorrecta - DEBE CORREGIRSE"
-  );
-  console.warn("🔍 Token actual:", cleanToken);
-  console.warn(
-    "🎯 Token esperado: APP_USR-7800621910376941-080814-be7c8e876a14808391e3f88dc18d9200-1493848747"
-  );
-} else {
-  console.log("✅ Token MercadoPago limpiado correctamente");
-}
 
 export const mercadopago = new MercadoPagoConfig({
   accessToken: cleanToken,
