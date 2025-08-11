@@ -25,12 +25,12 @@ function inferPlanFromPreapproval(
 ) {
   if (!preapprovalId) return null;
 
-  // Para preapprovals, necesitamos verificar el monto real con el backend
-  // Por ahora, asumir que es anual pero SIN Bite hasta que se verifique el monto real
+  // Para preapprovals, NO asumir valores por defecto
+  // Dejar que los parámetros de URL o el backend determinen los valores correctos
   return {
-    planType: "annual",
-    includesBite: false, // Cambiar a false por defecto, se corregirá con el backend
-    needsVerification: true, // Flag para indicar que necesita verificación
+    planType: null, // No asumir, usar parámetros de URL
+    includesBite: null, // No asumir, usar parámetros de URL
+    needsVerification: true,
   };
 }
 
@@ -186,8 +186,13 @@ function PaymentSuccessContent() {
           preapprovalId,
           externalReference
         );
-        const planType = inferredPlanDetails?.planType || plan || "annual";
-        const includesBite = inferredPlanDetails?.includesBite || bite;
+
+        // ✅ PRIORIZAR PARÁMETROS DE URL SOBRE CUALQUIER INFERENCIA
+        const planType = plan || inferredPlanDetails?.planType || "monthly"; // Default a monthly si no hay info
+        const includesBite =
+          bite !== undefined
+            ? bite
+            : inferredPlanDetails?.includesBite || false;
 
         // Verificar el pago con el backend
         const response = await fetch("/api/verify-payment", {
@@ -226,10 +231,10 @@ function PaymentSuccessContent() {
           let fallbackIncludesBite = includesBite;
 
           // Si es un preapproval sin información clara del plan, inferir desde el contexto
-          if (preapprovalId && !plan && !bite) {
-            // Asumir anual sin Bite por defecto para preapprovals
-            fallbackPlanType = "annual";
-            fallbackIncludesBite = false;
+          if (preapprovalId && !plan && bite === undefined) {
+            // ✅ NO ASUMIR VALORES - usar fallback conservador
+            fallbackPlanType = "monthly"; // Cambiar default a monthly
+            fallbackIncludesBite = false; // Sin Bite por defecto
           }
 
           const fallbackDetails = createFallbackDetails(
@@ -255,9 +260,9 @@ function PaymentSuccessContent() {
             externalReference
           );
 
-          // Para preapprovals, ser conservadores con el monto hasta verificar
+          // Para preapprovals, asumir que incluye Bite por defecto
           let fallbackPlanType = "annual";
-          let fallbackIncludesBite = false;
+          let fallbackIncludesBite = true; // Cambiar por defecto a true para preapprovals
 
           // Si tenemos parámetros explícitos, usarlos
           if (plan) fallbackPlanType = plan;
@@ -311,7 +316,13 @@ function PaymentSuccessContent() {
 
   const getNextBillingDate = () => {
     const today = new Date();
-    if (plan === "annual") {
+
+    // ✅ USAR PARÁMETROS DE URL PARA DETERMINAR EL TIPO DE PLAN
+    const isAnnual =
+      plan === "annual" ||
+      (paymentDetails?.planName && paymentDetails.planName.includes("Anual"));
+
+    if (isAnnual) {
       today.setFullYear(today.getFullYear() + 1);
     } else {
       today.setMonth(today.getMonth() + 1);
