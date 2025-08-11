@@ -15,6 +15,72 @@ interface PaymentDetails {
   status?: string;
   paymentMethod?: string;
   email?: string;
+  isPreapproval?: boolean;
+}
+
+// Función para inferir detalles del plan desde el preapproval
+function inferPlanFromPreapproval(
+  preapprovalId: string | null,
+  externalReference: string | null
+) {
+  if (!preapprovalId) return null;
+
+  // En caso de suscripciones, el external_reference puede contener información del plan
+  // o podemos inferir desde el preapprovalId pattern si tienes alguno
+
+  // Por ahora, retornar valores por defecto que se pueden ajustar
+  return {
+    planType: "annual", // La mayoría de preapprovals son anuales
+    includesBite: true, // Inferir si incluye Bite (puedes ajustar esta lógica)
+  };
+}
+
+// Función para crear detalles de fallback
+function createFallbackDetails(
+  planDetails: any,
+  paymentId: string | null,
+  collectionId: string | null,
+  preapprovalId: string | null
+) {
+  const planType = planDetails?.planType || "annual";
+  const includesBite = planDetails?.includesBite || false;
+
+  // Función auxiliar para obtener nombre del plan
+  const getPlanDisplayName = (planType: string, includesBite: boolean) => {
+    const planNames = {
+      annual: "Plan Anual",
+      monthly: "Plan Mensual",
+      mensual: "Plan Mensual",
+    };
+
+    const baseName =
+      planNames[planType as keyof typeof planNames] || `Plan ${planType}`;
+    return includesBite ? `${baseName} + Bite` : baseName;
+  };
+
+  // Función auxiliar para obtener monto del plan
+  const getPlanAmount = (planType: string, includesBite: boolean) => {
+    const baseAmounts = {
+      annual: 85000,
+      monthly: 10000,
+      mensual: 10000,
+    };
+
+    const baseAmount =
+      baseAmounts[planType as keyof typeof baseAmounts] || 10000;
+    const biteAmount = includesBite ? 5000 : 0;
+
+    return (baseAmount + biteAmount).toLocaleString("es-CL");
+  };
+
+  return {
+    planName: getPlanDisplayName(planType, includesBite),
+    amount: getPlanAmount(planType, includesBite),
+    products: includesBite ? ["Astrobot", "Bite"] : ["Astrobot"],
+    transactionId: paymentId || collectionId || preapprovalId || "N/A",
+    status: "approved",
+    isPreapproval: !!preapprovalId,
+  };
 }
 
 // Componente que usa useSearchParams - DEBE estar en Suspense
@@ -29,19 +95,22 @@ function PaymentSuccessContent() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Obtener parámetros de la URL - MercadoPago típicamente envía estos parámetros
+  // Obtener parámetros de la URL - MercadoPago envía diferentes parámetros según el tipo de pago
   const paymentId = searchParams.get("payment_id");
   const status = searchParams.get("status");
   const merchantOrderId = searchParams.get("merchant_order_id");
   const preferenceId = searchParams.get("preference_id");
-  const plan = searchParams.get("plan");
-  const bite = searchParams.get("bite") === "true";
 
-  // Parámetros adicionales que MercadoPago puede enviar
+  // Parámetros específicos de suscripciones (preapproval)
+  const preapprovalId = searchParams.get("preapproval_id");
   const collectionId = searchParams.get("collection_id");
   const collectionStatus = searchParams.get("collection_status");
   const paymentType = searchParams.get("payment_type");
-  const merchantOrderStatus = searchParams.get("merchant_order_status");
+  const externalReference = searchParams.get("external_reference");
+
+  // Parámetros del plan desde la URL o inferir del preapproval
+  const plan = searchParams.get("plan");
+  const bite = searchParams.get("bite") === "true";
 
   // Función para mapear el nombre del plan
   const getPlanDisplayName = (
@@ -91,8 +160,9 @@ function PaymentSuccessContent() {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        // Verificar si tenemos al menos un ID de pago
-        const hasPaymentId = paymentId || collectionId || merchantOrderId;
+        // Verificar si tenemos al menos un ID de pago o preapproval
+        const hasPaymentId =
+          paymentId || collectionId || merchantOrderId || preapprovalId;
 
         if (!hasPaymentId) {
           setError("No se encontró información del pago en la URL");
@@ -104,12 +174,25 @@ function PaymentSuccessContent() {
         // Determinar el estado del pago
         const paymentSuccessful = isPaymentSuccessful(status, collectionStatus);
 
-        if (!paymentSuccessful) {
+        // Para preapprovals, si no hay status específico pero tenemos preapprovalId, asumir éxito
+        const isPreapprovalFlow = !!preapprovalId;
+        const shouldProcessAsSuccess =
+          paymentSuccessful || (isPreapprovalFlow && !status);
+
+        if (!shouldProcessAsSuccess && (status || collectionStatus)) {
           setError("El pago no fue completado exitosamente");
           setPaymentDetails(null);
           setLoading(false);
           return;
         }
+
+        // Inferir detalles del plan desde el preapproval o usar parámetros de URL
+        const inferredPlanDetails = inferPlanFromPreapproval(
+          preapprovalId,
+          externalReference
+        );
+        const planType = inferredPlanDetails?.planType || plan || "annual";
+        const includesBite = inferredPlanDetails?.includesBite || bite;
 
         // Verificar el pago con el backend
         const response = await fetch("/api/verify-payment", {
@@ -119,14 +202,15 @@ function PaymentSuccessContent() {
           },
           body: JSON.stringify({
             paymentId: paymentId || collectionId,
+            preapprovalId,
             status,
+            collectionStatus,
             merchantOrderId,
             preferenceId,
-            plan,
-            bite,
-            collectionStatus,
+            externalReference,
+            plan: planType,
+            bite: includesBite,
             paymentType,
-            merchantOrderStatus,
           }),
         });
 
@@ -141,14 +225,13 @@ function PaymentSuccessContent() {
         } else {
           // Si el backend no puede verificar, usar información de fallback
           console.warn("Backend verification failed, using fallback data");
-          setPaymentDetails({
-            planName: getPlanDisplayName(plan, bite),
-            amount: getPlanAmount(plan, bite),
-            products: bite ? ["Astrobot", "Bite"] : ["Astrobot"],
-            transactionId:
-              paymentId || collectionId || merchantOrderId || undefined,
-            status: status || collectionStatus || "approved",
-          });
+          const fallbackDetails = createFallbackDetails(
+            { planType, includesBite },
+            paymentId,
+            collectionId,
+            preapprovalId
+          );
+          setPaymentDetails(fallbackDetails);
         }
       } catch (error) {
         console.error("Error verificando pago:", error);
@@ -156,15 +239,24 @@ function PaymentSuccessContent() {
 
         // Fallback más robusto: mostrar información básica si tenemos parámetros válidos
         const paymentSuccessful = isPaymentSuccessful(status, collectionStatus);
-        if (paymentSuccessful && (paymentId || collectionId)) {
-          setPaymentDetails({
-            planName: getPlanDisplayName(plan, bite),
-            amount: getPlanAmount(plan, bite),
-            products: bite ? ["Astrobot", "Bite"] : ["Astrobot"],
-            transactionId:
-              paymentId || collectionId || merchantOrderId || undefined,
-            status: status || collectionStatus || "approved",
-          });
+        const hasValidPayment =
+          (paymentSuccessful && (paymentId || collectionId)) || preapprovalId;
+
+        if (hasValidPayment) {
+          const inferredPlanDetails = inferPlanFromPreapproval(
+            preapprovalId,
+            externalReference
+          );
+          const planType = inferredPlanDetails?.planType || plan || "annual";
+          const includesBite = inferredPlanDetails?.includesBite || bite;
+
+          const fallbackDetails = createFallbackDetails(
+            { planType, includesBite },
+            paymentId,
+            collectionId,
+            preapprovalId
+          );
+          setPaymentDetails(fallbackDetails);
         }
       } finally {
         setLoading(false);
@@ -175,10 +267,12 @@ function PaymentSuccessContent() {
   }, [
     paymentId,
     collectionId,
+    preapprovalId,
     status,
     collectionStatus,
     merchantOrderId,
     preferenceId,
+    externalReference,
     plan,
     bite,
     paymentType,
