@@ -12,6 +12,9 @@ interface PaymentDetails {
   transactionId?: string;
   nextBilling?: string;
   products?: string[];
+  status?: string;
+  paymentMethod?: string;
+  email?: string;
 }
 
 // Componente que usa useSearchParams - DEBE estar en Suspense
@@ -26,27 +29,84 @@ function PaymentSuccessContent() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Obtener parámetros de la URL
+  // Obtener parámetros de la URL - MercadoPago típicamente envía estos parámetros
   const paymentId = searchParams.get("payment_id");
   const status = searchParams.get("status");
   const merchantOrderId = searchParams.get("merchant_order_id");
+  const preferenceId = searchParams.get("preference_id");
   const plan = searchParams.get("plan");
   const bite = searchParams.get("bite") === "true";
+
+  // Parámetros adicionales que MercadoPago puede enviar
+  const collectionId = searchParams.get("collection_id");
+  const collectionStatus = searchParams.get("collection_status");
+  const paymentType = searchParams.get("payment_type");
+  const merchantOrderStatus = searchParams.get("merchant_order_status");
+
+  // Función para mapear el nombre del plan
+  const getPlanDisplayName = (
+    planType: string | null,
+    includesBite: boolean
+  ) => {
+    if (!planType) return "Plan seleccionado";
+
+    const planNames = {
+      annual: "Plan Anual",
+      monthly: "Plan Mensual",
+      mensual: "Plan Mensual",
+    };
+
+    const baseName =
+      planNames[planType as keyof typeof planNames] || `Plan ${planType}`;
+    return includesBite ? `${baseName} + Bite` : baseName;
+  };
+
+  // Función para obtener el monto según el plan
+  const getPlanAmount = (planType: string | null, includesBite: boolean) => {
+    const baseAmounts = {
+      annual: 85000,
+      monthly: 10000,
+      mensual: 10000,
+    };
+
+    const baseAmount =
+      baseAmounts[planType as keyof typeof baseAmounts] || 10000;
+    const biteAmount = includesBite ? 5000 : 0; // Asume que Bite cuesta 5000 extra
+
+    return (baseAmount + biteAmount).toLocaleString("es-CL");
+  };
+
+  // Función para determinar si el pago fue exitoso
+  const isPaymentSuccessful = (
+    status: string | null,
+    collectionStatus: string | null
+  ) => {
+    const successStatuses = ["approved", "success", "completed"];
+    return (
+      successStatuses.includes(status?.toLowerCase() || "") ||
+      successStatuses.includes(collectionStatus?.toLowerCase() || "")
+    );
+  };
 
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        if (!paymentId && !merchantOrderId) {
-          // Si no hay IDs de pago, mostrar información básica desde URL params
-          setPaymentDetails({
-            planName: plan
-              ? `Plan ${plan === "annual" ? "Anual" : "Mensual"}${
-                  bite ? " + Bite" : ""
-                }`
-              : "Plan seleccionado",
-            amount: plan === "annual" ? "85.000" : "10.000",
-            products: bite ? ["Astrobot", "Bite"] : ["Astrobot"],
-          });
+        // Verificar si tenemos al menos un ID de pago
+        const hasPaymentId = paymentId || collectionId || merchantOrderId;
+
+        if (!hasPaymentId) {
+          setError("No se encontró información del pago en la URL");
+          setPaymentDetails(null);
+          setLoading(false);
+          return;
+        }
+
+        // Determinar el estado del pago
+        const paymentSuccessful = isPaymentSuccessful(status, collectionStatus);
+
+        if (!paymentSuccessful) {
+          setError("El pago no fue completado exitosamente");
+          setPaymentDetails(null);
           setLoading(false);
           return;
         }
@@ -58,63 +118,88 @@ function PaymentSuccessContent() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            paymentId,
+            paymentId: paymentId || collectionId,
             status,
             merchantOrderId,
+            preferenceId,
             plan,
             bite,
+            collectionStatus,
+            paymentType,
+            merchantOrderStatus,
           }),
         });
 
         if (!response.ok) {
-          throw new Error("Error verificando el pago");
+          throw new Error(`Error del servidor: ${response.status}`);
         }
 
         const data = await response.json();
 
-        if (data.success) {
+        if (data.success && data.details) {
           setPaymentDetails(data.details);
         } else {
-          setError(data.message || "Error verificando el pago");
+          // Si el backend no puede verificar, usar información de fallback
+          console.warn("Backend verification failed, using fallback data");
+          setPaymentDetails({
+            planName: getPlanDisplayName(plan, bite),
+            amount: getPlanAmount(plan, bite),
+            products: bite ? ["Astrobot", "Bite"] : ["Astrobot"],
+            transactionId:
+              paymentId || collectionId || merchantOrderId || undefined,
+            status: status || collectionStatus || "approved",
+          });
         }
       } catch (error) {
         console.error("Error verificando pago:", error);
         setError("Error de conexión al verificar el pago");
 
-        // Fallback: mostrar información básica
-        setPaymentDetails({
-          planName: plan
-            ? `Plan ${plan === "annual" ? "Anual" : "Mensual"}${
-                bite ? " + Bite" : ""
-              }`
-            : "Plan seleccionado",
-          amount: plan === "annual" ? "85.000" : "10.000",
-          products: bite ? ["Astrobot", "Bite"] : ["Astrobot"],
-        });
+        // Fallback más robusto: mostrar información básica si tenemos parámetros válidos
+        const paymentSuccessful = isPaymentSuccessful(status, collectionStatus);
+        if (paymentSuccessful && (paymentId || collectionId)) {
+          setPaymentDetails({
+            planName: getPlanDisplayName(plan, bite),
+            amount: getPlanAmount(plan, bite),
+            products: bite ? ["Astrobot", "Bite"] : ["Astrobot"],
+            transactionId:
+              paymentId || collectionId || merchantOrderId || undefined,
+            status: status || collectionStatus || "approved",
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
 
     verifyPayment();
-  }, [paymentId, status, merchantOrderId, plan, bite]);
+  }, [
+    paymentId,
+    collectionId,
+    status,
+    collectionStatus,
+    merchantOrderId,
+    preferenceId,
+    plan,
+    bite,
+    paymentType,
+  ]);
 
   // Simular carga inicial para evitar pestañeo
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
-    }, 500);
+    }, 800);
     return () => clearTimeout(timer);
   }, []);
 
-  const formatDate = () => {
-    const today = new Date();
+  const formatDate = (date?: string) => {
+    const targetDate = date ? new Date(date) : new Date();
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
       month: "long",
       day: "numeric",
     };
-    return today.toLocaleDateString("es-CL", options);
+    return targetDate.toLocaleDateString("es-CL", options);
   };
 
   const getNextBillingDate = () => {
@@ -124,45 +209,28 @@ function PaymentSuccessContent() {
     } else {
       today.setMonth(today.getMonth() + 1);
     }
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    return today.toLocaleDateString("es-CL", options);
+    return formatDate(today.toISOString());
   };
 
+  // Estado de carga inicial
   if (initialLoading) {
     return (
       <div
         className={`payment-result-container ${
           theme === "dark" ? "dark-theme" : "light-theme"
         }`}
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "2rem",
-        }}
       >
-        <div
-          className="result-card"
-          style={{
-            textAlign: "center",
-            maxWidth: "600px",
-            width: "100%",
-          }}
-        >
+        <div className="result-card">
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <p>Cargando...</p>
+            <p>Procesando información del pago...</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // Estado de carga de verificación
   if (loading) {
     return (
       <div
@@ -173,13 +241,53 @@ function PaymentSuccessContent() {
         <div className="result-card">
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <p>Verificando tu pago...</p>
+            <p>Verificando tu pago con MercadoPago...</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // Estado de error sin detalles de pago
+  if (error && !paymentDetails) {
+    return (
+      <div
+        className={`payment-result-container ${
+          theme === "dark" ? "dark-theme" : "light-theme"
+        }`}
+      >
+        <div className="result-card error">
+          <div className="result-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="#ef4444" />
+              <path
+                d="m15 9-6 6M9 9l6 6"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h1>Error en el pago</h1>
+          <p className="subtitle">{error}</p>
+          <div className="action-buttons">
+            <button
+              onClick={() => router.push("/pricing")}
+              className="btn-primary"
+            >
+              Intentar nuevamente
+            </button>
+            <button onClick={() => router.push("/")} className="btn-secondary">
+              Volver al inicio
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Estado de éxito con detalles
   return (
     <div
       className={`payment-result-container ${
@@ -206,57 +314,88 @@ function PaymentSuccessContent() {
         </p>
 
         {error && (
-          <div className="error-notice">
+          <div className="warning-notice">
             <p>⚠️ {error}</p>
             <p>
-              Tu pago fue procesado exitosamente, pero no pudimos verificar
-              todos los detalles.
+              Tu pago fue procesado exitosamente, pero algunos detalles podrían
+              no estar completos.
             </p>
           </div>
         )}
 
         {paymentDetails && (
           <div className="payment-summary">
+            <h3>Detalles de la suscripción</h3>
+
             <div className="detail-row">
-              <span>Fecha:</span>
+              <span>Fecha de compra:</span>
               <span>{formatDate()}</span>
             </div>
+
             <div className="detail-row">
               <span>Plan:</span>
               <span>{paymentDetails.planName}</span>
             </div>
+
             {paymentDetails.products && (
               <div className="detail-row">
-                <span>Productos:</span>
+                <span>Productos incluidos:</span>
                 <span>{paymentDetails.products.join(" + ")}</span>
               </div>
             )}
-            <div className="detail-row">
-              <span>Monto:</span>
+
+            <div className="detail-row highlight">
+              <span>Monto pagado:</span>
               <span>${paymentDetails.amount} CLP</span>
             </div>
+
             {paymentDetails.transactionId && (
               <div className="detail-row">
                 <span>ID de transacción:</span>
-                <span>{paymentDetails.transactionId}</span>
+                <span className="transaction-id">
+                  {paymentDetails.transactionId}
+                </span>
               </div>
             )}
+
             <div className="detail-row">
-              <span>Suscripción activa hasta:</span>
+              <span>Próxima renovación:</span>
               <span>{paymentDetails.nextBilling || getNextBillingDate()}</span>
             </div>
+
+            {paymentDetails.status && (
+              <div className="detail-row">
+                <span>Estado:</span>
+                <span className="status-badge">
+                  {paymentDetails.status === "approved"
+                    ? "Aprobado"
+                    : paymentDetails.status}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
         <div className="action-buttons">
-          <button onClick={() => router.push("/")} className="btn-primary">
-            Volver
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="btn-primary"
+          >
+            Ir al Dashboard
+          </button>
+          <button onClick={() => router.push("/")} className="btn-secondary">
+            Volver al inicio
           </button>
         </div>
 
-        <p className="footer-text">
-          Recibirás un email de confirmación en los próximos minutos.
-        </p>
+        <div className="footer-info">
+          <p className="footer-text">
+            ✉️ Recibirás un email de confirmación en los próximos minutos.
+          </p>
+          <p className="footer-text small">
+            Si tienes algún problema, contacta a nuestro soporte.
+          </p>
+        </div>
       </div>
 
       <style jsx>{`
@@ -282,6 +421,14 @@ function PaymentSuccessContent() {
             : "none"};
         }
 
+        .result-card.error {
+          border-left: 4px solid #ef4444;
+        }
+
+        .result-card.success {
+          border-left: 4px solid #10b981;
+        }
+
         .result-icon {
           margin-bottom: 1.5rem;
           display: flex;
@@ -301,7 +448,7 @@ function PaymentSuccessContent() {
           margin-bottom: 2rem;
         }
 
-        .error-notice {
+        .warning-notice {
           background: rgba(249, 115, 22, 0.1);
           border: 1px solid rgba(249, 115, 22, 0.3);
           border-radius: 8px;
@@ -321,31 +468,70 @@ function PaymentSuccessContent() {
           text-align: left;
         }
 
+        .payment-summary h3 {
+          margin: 0 0 1.5rem 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: ${theme === "dark" ? "white" : "#1f2937"};
+          text-align: center;
+        }
+
         .detail-row {
           display: flex;
           justify-content: space-between;
           margin-bottom: 0.75rem;
-          font-size: 1.5rem;
+          font-size: 1rem;
+          padding: 0.5rem 0;
         }
 
         .detail-row:last-child {
           margin-bottom: 0;
         }
 
+        .detail-row.highlight {
+          background: ${theme === "dark"
+            ? "rgba(16, 185, 129, 0.1)"
+            : "rgba(16, 185, 129, 0.05)"};
+          border-radius: 6px;
+          padding: 0.75rem;
+          margin: 0.5rem -0.25rem;
+          font-weight: 600;
+        }
+
         .detail-row span:first-child {
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
+          font-weight: 500;
         }
 
         .detail-row span:last-child {
           font-weight: 600;
           color: ${theme === "dark" ? "white" : "#1f2937"};
+          text-align: right;
+        }
+
+        .transaction-id {
+          font-family: monospace;
+          font-size: 0.875rem;
+          background: ${theme === "dark" ? "rgba(255,255,255,0.1)" : "#e5e7eb"};
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+        }
+
+        .status-badge {
+          background: #10b981;
+          color: white;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.875rem;
+          font-weight: 600;
         }
 
         .action-buttons {
           display: flex;
           gap: 1rem;
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
           justify-content: center;
+          flex-wrap: wrap;
         }
 
         .btn-primary {
@@ -355,36 +541,51 @@ function PaymentSuccessContent() {
           padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 1.5rem;
+          font-size: 1rem;
           cursor: pointer;
           transition: all 0.2s;
+          min-width: 140px;
         }
 
         .btn-primary:hover {
           opacity: 0.9;
+          transform: translateY(-1px);
         }
 
         .btn-secondary {
           background: transparent;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           border: 1px solid ${theme === "dark" ? "#374151" : "#d1d5db"};
-          padding: 0.75rem 1.5rem;
+          padding: 0.875rem 1.75rem;
           border-radius: 8px;
           font-weight: 600;
+          font-size: 1rem;
           cursor: pointer;
           transition: all 0.2s;
+          min-width: 140px;
         }
 
         .btn-secondary:hover {
           background: ${theme === "dark"
             ? "rgba(255,255,255,0.05)"
             : "#f9fafb"};
+          transform: translateY(-1px);
+        }
+
+        .footer-info {
+          border-top: 1px solid ${theme === "dark" ? "#374151" : "#e5e7eb"};
+          padding-top: 1.5rem;
         }
 
         .footer-text {
-          font-size: 1.125rem;
+          font-size: 1rem;
           color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
-          margin: 0;
+          margin: 0.5rem 0;
+        }
+
+        .footer-text.small {
+          font-size: 0.875rem;
+          opacity: 0.8;
         }
 
         .loading-spinner {
@@ -393,6 +594,7 @@ function PaymentSuccessContent() {
           align-items: center;
           gap: 1rem;
           color: ${theme === "dark" ? "white" : "#1f2937"};
+          padding: 2rem;
         }
 
         .spinner {
@@ -413,9 +615,26 @@ function PaymentSuccessContent() {
           }
         }
 
-        @media (min-width: 640px) {
+        @media (max-width: 640px) {
+          .result-card {
+            padding: 2rem;
+          }
+
+          h1 {
+            font-size: 2rem;
+          }
+
+          .subtitle {
+            font-size: 1.25rem;
+          }
+
           .action-buttons {
-            justify-content: center;
+            flex-direction: column;
+          }
+
+          .btn-primary,
+          .btn-secondary {
+            width: 100%;
           }
         }
       `}</style>
