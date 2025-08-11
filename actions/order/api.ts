@@ -12,6 +12,10 @@ interface Message {
 // ✅ SOLUCIÓN: Limpiar token antes de usar
 const rawToken = process.env.MP_ACCESS_TOKEN!;
 
+console.log("🔍 DEBUG - Token completo:", JSON.stringify(rawToken));
+console.log("🔍 DEBUG - Token length:", rawToken.length);
+console.log("🔍 DEBUG - Token preview:", rawToken);
+
 console.log("🔧 Limpiando token de MercadoPago...");
 console.log("Token original length:", rawToken.length);
 
