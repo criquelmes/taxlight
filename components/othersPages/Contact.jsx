@@ -15,6 +15,7 @@ const Result = ({ success }) => {
     </p>
   );
 };
+
 export default function Contact() {
   const [result, showResult] = useState({ show: false, success: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,23 +31,29 @@ export default function Contact() {
 
     // Lista de correos que recibirán el mensaje
     const destinatarios = [
-      "contacto@grupowolf.cl",
+      // "contacto@grupowolf.cl",
       "ccriquelmes@gmail.com",
       // Agrega más correos aquí
     ];
 
+    // Obtener datos del formulario
+    const formData = new FormData(formRef.current);
+    const baseParams = {
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      subject: formData.get("subject"),
+      message: formData.get("message"),
+    };
+
     // Enviar a cada destinatario
     const envios = destinatarios.map((email) => {
-      // Crear una copia del form data y agregar el destinatario
-      const formData = new FormData(formRef.current);
-      formData.append("to_email", email);
+      const templateParams = {
+        ...baseParams,
+        to_email: email, // Esto es lo importante
+      };
 
-      return emailjs.sendForm(serviceId, templateId, formRef.current, {
-        publicKey,
-        templateParams: {
-          to_email: email,
-        },
-      });
+      return emailjs.send(serviceId, templateId, templateParams, { publicKey });
     });
 
     Promise.all(envios)
@@ -123,13 +130,15 @@ export default function Contact() {
                       <div className="inner">
                         <h4 className="title">Direcciones de correo</h4>
                         <p>
-                          <a href="mailto:admin@gmail.com">email@taxlight.cl</a>
-                        </p>
-                        <p>
-                          <a href="mailto:example@gmail.com">
-                            email@grupowolf.cl
+                          <a href="mailto:contacto@grupowolf.cl">
+                            contacto@grupowolf.cl
                           </a>
                         </p>
+                        {/* <p>
+                          <a href="mailto:ccriquelmes@gmail.com">
+                            ccriquelmes@gmail.com
+                          </a>
+                        </p> */}
                       </div>
                     </div>
                   </div>
