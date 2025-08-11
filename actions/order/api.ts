@@ -9,8 +9,42 @@ interface Message {
   createdAt: Date;
 }
 
+// ✅ SOLUCIÓN: Limpiar token antes de usar
+const rawToken = process.env.MP_ACCESS_TOKEN!;
+
+console.log("🔧 Limpiando token de MercadoPago...");
+console.log("Token original length:", rawToken.length);
+
+// Limpiar caracteres invisibles y espacios
+const cleanToken = rawToken
+  .split("")
+  .filter((char) => {
+    const code = char.charCodeAt(0);
+    // Solo mantener caracteres ASCII válidos (33-126), excluyendo espacios
+    return code >= 33 && code <= 126;
+  })
+  .join("");
+
+console.log("Token limpio length:", cleanToken.length);
+
+// Validar que el token tenga el formato correcto
+if (!/^APP_USR-\d+-\d+-[a-f0-9]+-\d+$/.test(cleanToken)) {
+  console.error("❌ Token de MercadoPago tiene formato inválido:", cleanToken);
+  throw new Error("Invalid MercadoPago token format");
+}
+
+// Validar longitud esperada (87 caracteres)
+if (cleanToken.length !== 87) {
+  console.error(
+    `❌ Token length incorrecto: ${cleanToken.length}, esperado: 87`
+  );
+  throw new Error(`Invalid token length: ${cleanToken.length}`);
+}
+
+console.log("✅ Token MercadoPago limpiado correctamente");
+
 export const mercadopago = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
+  accessToken: cleanToken,
 });
 
 // 🆕 FUNCIÓN PARA ELIMINAR CUENTA DEL BACKEND
