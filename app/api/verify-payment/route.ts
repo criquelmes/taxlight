@@ -6,9 +6,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       paymentId,
+      preapprovalId,
       status,
       merchantOrderId,
       preferenceId,
+      externalReference,
       plan,
       bite,
       collectionId,
@@ -19,23 +21,30 @@ export async function POST(request: NextRequest) {
 
     console.log("🔍 Verificando pago:", {
       paymentId,
+      preapprovalId,
       collectionId,
       status,
       collectionStatus,
       merchantOrderId,
       preferenceId,
+      externalReference,
       plan,
       bite,
       paymentType,
       merchantOrderStatus,
     });
 
-    // Determinar el ID de pago principal
-    const primaryPaymentId = paymentId || collectionId;
+    // Determinar el ID de pago principal (preapproval tiene prioridad para suscripciones)
+    const primaryPaymentId = preapprovalId || paymentId || collectionId;
     const primaryStatus = status || collectionStatus;
 
     // Validar que tenemos información mínima
-    if (!primaryPaymentId && !merchantOrderId && !preferenceId) {
+    if (
+      !primaryPaymentId &&
+      !merchantOrderId &&
+      !preferenceId &&
+      !externalReference
+    ) {
       console.error("❌ No se encontró ningún identificador de pago");
       return NextResponse.json(
         {
@@ -46,11 +55,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar que el estado sea exitoso
+    // Verificar que el estado sea exitoso (para preapprovals, puede no tener status)
     const successStatuses = ["approved", "authorized", "success", "completed"];
-    const isPaymentSuccessful = successStatuses.includes(
-      primaryStatus?.toLowerCase() || ""
-    );
+    const isPaymentSuccessful =
+      successStatuses.includes(primaryStatus?.toLowerCase() || "") ||
+      !!preapprovalId;
 
     if (!isPaymentSuccessful && primaryStatus) {
       console.warn(`⚠️ Pago no exitoso. Estado: ${primaryStatus}`);
@@ -81,8 +90,10 @@ export async function POST(request: NextRequest) {
         const orders = await api.order.getPendingTransactions();
         const matchingOrder = findMatchingOrder(orders, {
           paymentId: primaryPaymentId,
+          preapprovalId,
           merchantOrderId,
           preferenceId,
+          externalReference,
         });
 
         if (matchingOrder) {
@@ -113,12 +124,8 @@ export async function POST(request: NextRequest) {
                   products: planDetails.products,
                   status: "approved",
                   paymentMethod:
-                    "paymentMethod" in statusResult &&
-                    statusResult.paymentMethod
-                      ? statusResult.paymentMethod
-                      : "mercadopago",
-                  email:
-                    "email" in statusResult ? statusResult.email : undefined,
+                    getPaymentMethodFromResult(statusResult) || "mercadopago",
+                  email: getEmailFromResult(statusResult, matchingOrder),
                   verified: true,
                 },
                 message: "Pago verificado exitosamente con MercadoPago",
@@ -132,7 +139,7 @@ export async function POST(request: NextRequest) {
           } else {
             console.error(
               "❌ Error verificando con MercadoPago:",
-              statusResult.message
+              getErrorFromResult(statusResult)
             );
             verificationError = "Error verificando el pago con MercadoPago";
           }
@@ -191,11 +198,65 @@ export async function POST(request: NextRequest) {
         success: false,
         message: "Error interno del servidor",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? error instanceof Error
+              ? error.message
+              : "Unknown error"
+            : undefined,
       },
       { status: 500 }
     );
   }
+}
+
+// Función helper para extraer método de pago del resultado
+function getPaymentMethodFromResult(statusResult: any): string | undefined {
+  // Intentar obtener el método de pago de diferentes lugares posibles
+  if (statusResult.paymentMethod) {
+    return statusResult.paymentMethod;
+  }
+
+  if (statusResult.order?.paymentMethod) {
+    return statusResult.order.paymentMethod;
+  }
+
+  // Si no hay método específico, retornar undefined para usar el fallback
+  return undefined;
+}
+
+// Función helper para extraer email del resultado
+function getEmailFromResult(
+  statusResult: any,
+  matchingOrder: any
+): string | undefined {
+  // Intentar obtener el email de diferentes lugares
+  if (statusResult.email) {
+    return statusResult.email;
+  }
+
+  if (statusResult.order?.user?.email) {
+    return statusResult.order.user.email;
+  }
+
+  if (matchingOrder?.user?.email) {
+    return matchingOrder.user.email;
+  }
+
+  // Si no hay email disponible, retornar undefined
+  return undefined;
+}
+
+// Función helper para extraer error del resultado
+function getErrorFromResult(statusResult: any): string {
+  if (statusResult.error) {
+    return statusResult.error;
+  }
+
+  if (statusResult.message) {
+    return statusResult.message;
+  }
+
+  return "Error desconocido en la verificación";
 }
 
 // Función para encontrar orden coincidente
@@ -203,13 +264,31 @@ function findMatchingOrder(
   orders: any[],
   criteria: {
     paymentId?: string;
+    preapprovalId?: string;
     merchantOrderId?: string;
     preferenceId?: string;
+    externalReference?: string;
   }
 ) {
-  const { paymentId, merchantOrderId, preferenceId } = criteria;
+  const {
+    paymentId,
+    preapprovalId,
+    merchantOrderId,
+    preferenceId,
+    externalReference,
+  } = criteria;
 
   return orders.find((order) => {
+    // Buscar por preapprovalId (suscripciones)
+    if (
+      preapprovalId &&
+      (order.mpSubscriptionId === preapprovalId ||
+        order.transactionId === preapprovalId ||
+        order.id === preapprovalId)
+    ) {
+      return true;
+    }
+
     // Buscar por mpSubscriptionId
     if (paymentId && order.mpSubscriptionId === paymentId) {
       return true;
@@ -235,6 +314,11 @@ function findMatchingOrder(
       (order.preferenceId === preferenceId ||
         order.mpSubscriptionId === preferenceId)
     ) {
+      return true;
+    }
+
+    // Buscar por external reference (ID de la orden)
+    if (externalReference && order.id === externalReference) {
       return true;
     }
 
