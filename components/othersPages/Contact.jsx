@@ -28,18 +28,36 @@ export default function Contact() {
     const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
     const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-    emailjs
-      .sendForm(serviceId, templateId, formRef.current, { publicKey })
-      .then(
-        (result) => {
-          showResult({ show: true, success: true });
-          e.target.reset();
+    // Lista de correos que recibirán el mensaje
+    const destinatarios = [
+      "contacto@grupowolf.cl",
+      "ccriquelmes@gmail.com",
+      // Agrega más correos aquí
+    ];
+
+    // Enviar a cada destinatario
+    const envios = destinatarios.map((email) => {
+      // Crear una copia del form data y agregar el destinatario
+      const formData = new FormData(formRef.current);
+      formData.append("to_email", email);
+
+      return emailjs.sendForm(serviceId, templateId, formRef.current, {
+        publicKey,
+        templateParams: {
+          to_email: email,
         },
-        (error) => {
-          console.log("Error sending email:", error.text);
-          showResult({ show: true, success: false });
-        }
-      )
+      });
+    });
+
+    Promise.all(envios)
+      .then(() => {
+        showResult({ show: true, success: true });
+        e.target.reset();
+      })
+      .catch((error) => {
+        console.log("Error sending email:", error);
+        showResult({ show: true, success: false });
+      })
       .finally(() => {
         setIsSubmitting(false);
       });
