@@ -684,7 +684,7 @@ const api = {
 
             const mpSubscription = await new PreApproval(mercadopago).create({
               body: {
-                back_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success`,
+                back_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?plan=${subscriptionType}&bite=${includeBite}`,
 
                 reason: `Suscripción ${
                   subscriptionType === "annual" ? "Anual" : "Mensual"
